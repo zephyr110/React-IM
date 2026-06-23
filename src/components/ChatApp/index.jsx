@@ -12,13 +12,17 @@ import EditProfile from 'components/EditProfile'
 import Settings from 'components/Settings'
 import BlockedList from 'components/BlockedList'
 import VideoCall from 'components/VideoCall'
+import Login from 'components/Login'
 import { useTransition, animated } from 'react-spring'
 import avatarImg1 from 'assets/images/avatar-1.jpg'
 import avatarImg2 from 'assets/images/avatar-2.jpg'
 
+const AVATAR_MAP = { 'avatar-1': avatarImg1, 'avatar-2': avatarImg2 }
+
 function ChatApp ({ children, ...rest }) {
     const [showDrawer, setShowDrawer] = useState(false)
     const [videoCalling, setVideoCalling] = useState(false)
+    const [user, setUser] = useState(null)
 
     const location = useLocation()
     const getFirstSgmPath = (location) => location.pathname.split('/')[1]
@@ -28,6 +32,10 @@ function ChatApp ({ children, ...rest }) {
         enter: { opacity: 1, transform: 'translate3d(0, 0, 0)' },
         leave: { opacity: 0, transform: 'translate3d(-100px, 0, 1)' }
     })
+
+    if (!user) {
+        return <Login onLogin={setUser} />
+    }
 
     return (
         <StyledChatApp {...rest}>
@@ -42,7 +50,7 @@ function ChatApp ({ children, ...rest }) {
                             <Route path="/contacts" element={<ConcatList />} />
                             <Route path="/files" element={<FileList />} />
                             <Route path="/notes" element={<NoteList />} />
-                            <Route path="/settings" element={<EditProfile src={avatarImg1} />} />
+                            <Route path="/settings" element={<EditProfile src={AVATAR_MAP[user.avatar]} />} />
                         </Routes>
                     </animated.div>
                 ))}
@@ -61,7 +69,7 @@ function ChatApp ({ children, ...rest }) {
                 </Routes>
             </Content>
             <Drawer show={showDrawer}>
-                <Profile src={avatarImg2} name={'林凌'} onCloseClick={() => setShowDrawer(false)} />
+                <Profile src={AVATAR_MAP[user.avatar]} name={user.name} onCloseClick={() => setShowDrawer(false)} />
             </Drawer>
         </StyledChatApp >
     )
