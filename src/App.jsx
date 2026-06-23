@@ -5,13 +5,16 @@ import { ThemeProvider } from 'styled-components'
 import theme from './theme'
 import ChatApp from 'components/ChatApp'
 import { HashRouter as Router } from 'react-router-dom'
+import { SocketProvider } from './context/SocketContext'
 
 function App () {
   return (
     <Router>
-      <ThemeProvider theme={theme}>
-        <ChatApp />
-      </ThemeProvider>
+      <SocketProvider>
+        <ThemeProvider theme={theme}>
+          <ChatApp />
+        </ThemeProvider>
+      </SocketProvider>
     </Router>
   )
 }
