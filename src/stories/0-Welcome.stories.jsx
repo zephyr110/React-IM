@@ -1,14 +1,13 @@
-import React from 'react';
-import { linkTo } from '@storybook/addon-links';
-import { Welcome } from '@storybook/react/demo';
+import React from 'react'
 
 export default {
-  title: 'Welcome/ Welcome',
-  component: Welcome,
-};
+  title: 'Welcome',
+}
 
-export const ToStorybook = () => <Welcome showApp={linkTo('Button')} />;
-
-ToStorybook.story = {
-  name: 'to Storybook',
-};
+export const Welcome = () => (
+  <div style={{ padding: '40px', fontFamily: 'sans-serif' }}>
+    <h1>React-IM</h1>
+    <p>欢迎使用 React-IM Storybook。</p>
+    <p>在左侧边栏浏览各组件。</p>
+  </div>
+)
