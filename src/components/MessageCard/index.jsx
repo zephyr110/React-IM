@@ -5,7 +5,7 @@ import StyledMessageCard, { Name, Status, Time, Message, MessageText, UnreadBadg
 import Avatar from 'components/Avatar'
 import { useTheme } from 'styled-components'
 import Icon from 'components/Icon'
-import { ReactComponent as Replied } from 'assets/icons/replied.svg'
+import Replied from 'assets/icons/replied.svg?react'
 
 function MessageCard ({
     avatarSrc,

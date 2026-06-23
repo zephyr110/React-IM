@@ -3,10 +3,10 @@ import PropTypes from 'prop-types'
 import StyledBlockedList, { SettingsMenu, ClosableAvatar, BlockedAvatar, BlockedName, CloseIcon, FriendList, BackIcon } from './style'
 import Icon from 'components/Icon'
 import Text from 'components/Text'
-import { ReactComponent as ArrowMenuLeft } from 'assets/icons/arrowMenuLeft.svg'
+import ArrowMenuLeft from 'assets/icons/arrowMenuLeft.svg?react'
 import 'styled-components/macro'
 import avatarImg1 from 'assets/images/avatar-1.jpg'
-import { ReactComponent as closeCircle } from 'assets/icons/closeCircle.svg'
+import closeCircle from 'assets/icons/closeCircle.svg?react'
 import { useHistory } from 'react-router-dom'
 
 function BlockedList ({ children, ...rest }) {

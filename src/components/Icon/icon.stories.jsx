@@ -1,7 +1,7 @@
 
 import React from 'react'
 import Icon from '.';
-import { ReactComponent as SmileIcon } from 'assets/icons/smile.svg'
+import SmileIcon from 'assets/icons/smile.svg?react'
 import 'story.css'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faCommentDots, faStickyNote, faFolderOpen } from '@fortawesome/free-solid-svg-icons'

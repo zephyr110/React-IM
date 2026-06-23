@@ -5,7 +5,7 @@ import { DropdownItem } from './style'
 import Paragraph from 'components/Paragraph'
 import Seperator from 'components/Seperator'
 import Icon from 'components/Icon'
-import { ReactComponent as Options } from 'assets/icons/options.svg'
+import Options from 'assets/icons/options.svg?react'
 
 export default {
     title: 'UI组件/ Dropdown',

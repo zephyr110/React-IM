@@ -2,7 +2,7 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import StyledInput, { InputContainer, Prefix, Suffix } from './style'
 import Icon from 'components/Icon'
-import { ReactComponent as SearchIcon } from 'assets/icons/search.svg'
+import SearchIcon from 'assets/icons/search.svg?react'
 import { useTheme } from 'styled-components'
 import InputText from './InputText'
 

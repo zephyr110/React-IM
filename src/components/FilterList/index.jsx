@@ -7,7 +7,7 @@ import Select from 'components/Select'
 import Option from 'components/Option'
 import Button from 'components/Button'
 import Icon from 'components/Icon'
-import { ReactComponent as Plus } from 'assets/icons/plus.svg'
+import Plus from 'assets/icons/plus.svg?react'
 
 function FilterList ({
     children,

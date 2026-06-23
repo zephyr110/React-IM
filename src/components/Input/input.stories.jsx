@@ -1,8 +1,8 @@
 import React from 'react'
 import Input from '.';
 import Icon from 'components/Icon';
-import { ReactComponent as ClipIcon } from 'assets/icons/clip.svg'
-import { ReactComponent as PlanIcon } from 'assets/icons/plane.svg'
+import ClipIcon from 'assets/icons/clip.svg?react'
+import PlanIcon from 'assets/icons/plane.svg?react'
 
 export default {
     title: 'UI组件/ Input',
