@@ -30,7 +30,10 @@
     "build-storybook": "storybook build",
     "deploy": "gh-pages -d dist",
     "server": "node server/index.js",
-    "dev": "concurrently \"yarn server\" \"yarn start\""
+    "dev": "concurrently \"pnpm server\" \"pnpm start\""
+  },
+  "pnpm": {
+    "onlyBuiltDependencies": ["esbuild", "fsevents", "ejs"]
   },
   "devDependencies": {
     "@babel/preset-react": "^7.26.0",
