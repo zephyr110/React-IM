@@ -37,7 +37,7 @@ const Minimize = styled(Button)`
 
 const VideoCallAlert = styled.div`
     display: grid;
-    grid-template-areas: 
+    grid-template-areas:
         'avatar info info'
         'avatar action icon';
     row-gap: 5px;
@@ -52,19 +52,19 @@ const VideoCallAlert = styled.div`
     ${card()}
 `
 
-const StyledVedioCall = styled.div`
+const StyledVideoCall = styled.div`
     height: 100%;
     padding: 20px;
     padding-bottom: 40px;
     background-image: url(${({ src }) => src});
     background-size: cover;
     background-position: center;
-    
+
     display: grid;
-    grid-template-areas: 
+    grid-template-areas:
         'title title'
         'actions self';
 `
 
-export default StyledVedioCall
+export default StyledVideoCall
 export { Actions, Action, Self, Minimize, VideoCallAlert }

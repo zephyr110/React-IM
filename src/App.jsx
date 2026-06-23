@@ -1,10 +1,9 @@
 import React from 'react'
-import   './index.css'
-import './App.css';
-import { ThemeProvider } from 'styled-components';
-import theme from 'theme'
-import ChatApp from 'components/ChatApp';
-// import { BrowserRouter as Router } from 'react-router-dom'
+import './index.css'
+import './App.css'
+import { ThemeProvider } from 'styled-components'
+import theme from './theme'
+import ChatApp from 'components/ChatApp'
 import { HashRouter as Router } from 'react-router-dom'
 
 function App () {
@@ -17,4 +16,4 @@ function App () {
   )
 }
 
-export default App;
+export default App

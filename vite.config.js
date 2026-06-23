@@ -6,9 +6,7 @@ import path from 'path'
 export default defineConfig({
   plugins: [
     svgr(),
-    react({
-      jsxRuntime: 'classic',
-    }),
+    react(),
   ],
   resolve: {
     alias: {

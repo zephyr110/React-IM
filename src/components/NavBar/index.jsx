@@ -7,7 +7,7 @@ import Avatar from 'components/Avatar';
 import avatarImg1 from 'assets/images/avatar-1.jpg'
 import { faCommentDots, faUsers, faFolder, faCog, faEllipsisH, faStickyNote } from '@fortawesome/free-solid-svg-icons';
 import 'styled-components/macro'
-import { Link, matchPath, useLocation, Route } from 'react-router-dom'
+import { Link, matchPath, useLocation } from 'react-router-dom'
 
 function NavBar ({ children, ...rest }) {
     return (
@@ -36,20 +36,15 @@ function MenuItem ({ to, icon, showBadge, ...rest }) {
     // 判断路由
     const location = useLocation()
     // 当前路径与传递进来的路径匹配时，显示active
-    const active = !!matchPath(location.pathname, {
-        path: to,
-        exact: to === '/'
-    }) ? 1 : 0
+    const active = !!matchPath(to, location.pathname) ? 1 : 0
 
     return (
         <StyledMenuItem active={active} {...rest}>
-            <Route>
-                <Link to={to}>
-                    <Badge show={showBadge}>
-                        <MenuIcon active={active} icon={icon} />
-                    </Badge>
-                </Link>
-            </Route>
+            <Link to={to}>
+                <Badge show={showBadge}>
+                    <MenuIcon active={active} icon={icon} />
+                </Badge>
+            </Link>
         </StyledMenuItem>
     )
 }

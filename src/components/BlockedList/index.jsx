@@ -7,15 +7,15 @@ import ArrowMenuLeft from 'assets/icons/arrowMenuLeft.svg?react'
 import 'styled-components/macro'
 import avatarImg1 from 'assets/images/avatar-1.jpg'
 import closeCircle from 'assets/icons/closeCircle.svg?react'
-import { useHistory } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 
 function BlockedList ({ children, ...rest }) {
-    const history = useHistory()
+    const navigate = useNavigate()
 
     return (
         <StyledBlockedList {...rest}>
             <SettingsMenu>
-                <BackIcon onClick={() => history.goBack()}>
+                <BackIcon onClick={() => navigate(-1)}>
                     <Icon
                         icon={ArrowMenuLeft}
                         style={{ opacity: '0.5' }}

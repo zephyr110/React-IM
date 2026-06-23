@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
 import PropTypes from 'prop-types'
-import StyledVedioCall, { Actions, Minimize, Action, Self, VideoCallAlert } from './style'
-import vedioCaller from 'assets/images/paper-3.jpg'
+import StyledVideoCall, { Actions, Minimize, Action, Self, VideoCallAlert } from './style'
+import videoCaller from 'assets/images/paper-3.jpg'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faMicrophone, faCompressAlt, faPhoneSlash, faVolumeMute, faVideo } from '@fortawesome/free-solid-svg-icons'
 import Avatar from 'components/Avatar'
@@ -10,7 +10,7 @@ import avatarImg1 from 'assets/images/avatar-1.jpg'
 import avatarImg2 from 'assets/images/avatar-2.jpg'
 import 'styled-components/macro'
 import Text from 'components/Text'
-function VedioCall ({ onHangOffClick, children, ...rest }) {
+function VideoCall ({ onHangOffClick, children, ...rest }) {
     const [fullScreen, setFullScreen] = useState(true)
 
     if (!fullScreen) {
@@ -50,7 +50,7 @@ function VedioCall ({ onHangOffClick, children, ...rest }) {
     }
 
     return (
-        <StyledVedioCall src={vedioCaller} {...rest}>
+        <StyledVideoCall src={videoCaller} {...rest}>
             <Minimize shape='rect' onClick={() => setFullScreen(false)}>
                 <FontAwesomeIcon icon={faCompressAlt} />
             </Minimize>
@@ -68,14 +68,12 @@ function VedioCall ({ onHangOffClick, children, ...rest }) {
             <Self size='140px' src={avatarImg1} />
 
             {children}
-        </StyledVedioCall>
+        </StyledVideoCall>
     )
 }
 
-VedioCall.propTypes = {
+VideoCall.propTypes = {
     children: PropTypes.any
 }
 
-export default VedioCall
-
-
+export default VideoCall
