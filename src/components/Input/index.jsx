@@ -10,7 +10,7 @@ function Input ({ placeholder = '请输入内容', prefix, suffix, ...rest }) {
     return (
         <InputContainer>
             {prefix && <Prefix>{prefix}</Prefix>}
-            <StyledInput placeholder={placeholder} />
+            <StyledInput placeholder={placeholder} {...rest} />
             {suffix && <Suffix>{suffix}</Suffix>}
         </InputContainer>
     )

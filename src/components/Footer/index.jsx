@@ -13,6 +13,7 @@ import Button from 'components/Button'
 import Emoji from 'components/Emoji'
 import Popover from 'components/Popover'
 import { useTheme } from 'styled-components'
+import { useMessages } from 'context/MessageContext'
 
 function Footer ({
     children,
@@ -21,12 +22,30 @@ function Footer ({
     ...rest
 }) {
     const [emojiIconActive, setEmojiIconActive] = useState(false)
+    const [inputValue, setInputValue] = useState('')
     const theme = useTheme()
+    const { sendTextMessage, activeContactId } = useMessages()
+
+    const handleSend = () => {
+        if (!inputValue.trim()) return
+        sendTextMessage(inputValue)
+        setInputValue('')
+    }
+
+    const handleKeyDown = (e) => {
+        if (e.key === 'Enter') {
+            handleSend()
+        }
+    }
 
     return (
         <StyledFooter style={{ ...style, ...footerAnimation }} {...rest}>
             <Input
                 placeholder='请输入想和对方说的话'
+                value={inputValue}
+                onChange={(e) => setInputValue(e.target.value)}
+                onKeyDown={handleKeyDown}
+                disabled={!activeContactId}
                 prefix={<Icon icon={ClipIcon} />}
                 suffix={
                     <IconContainer>
@@ -43,7 +62,7 @@ function Footer ({
                             />
                         </Popover>
                         <Icon icon={MicrphoneIcon} style={{ cursor: 'pointer' }} />
-                        <Button size='42px'>
+                        <Button size='42px' onClick={handleSend}>
                             <Icon
                                 icon={PlaneIcon}
                                 color='#fff'

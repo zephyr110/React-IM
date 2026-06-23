@@ -6,9 +6,11 @@ import FilterList from 'components/FilterList'
 import ConcatCard from 'components/ConcatCard'
 import useStaggeredList from 'hooks/useStaggeredList'
 import { animated } from 'react-spring'
+import { useMessages } from 'context/MessageContext'
 
 function ConcatList ({ children, ...rest }) {
-    const trailAnimation = useStaggeredList(10)
+    const { contacts } = useMessages()
+    const trailAnimation = useStaggeredList(contacts.length || 1)
 
     return (
         <StyledConcatList {...rest}>
@@ -17,9 +19,15 @@ function ConcatList ({ children, ...rest }) {
                 actionLabel='添加好友'
             >
                 <Contacts>
-                    {new Array(10).fill(0).map((_, i) => (
-                        <animated.div key={i} style={trailAnimation[i]}>
-                            <ConcatCard key={i} />
+                    {contacts.map((contact, index) => (
+                        <animated.div key={contact.id} style={trailAnimation[index]}>
+                            <ConcatCard
+                                key={contact.id}
+                                avatar={contact.avatar}
+                                name={contact.name}
+                                intro={contact.intro}
+                                status={contact.online ? 'online' : 'offline'}
+                            />
                         </animated.div>
                     ))}
                 </Contacts>
