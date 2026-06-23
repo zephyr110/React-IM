@@ -38,6 +38,13 @@ const StyledButton = styled.button`
         transform: scale(1.1);
         box-shadow: 0px 6px 16px rgba(0, 0, 0, .12);
     }
+
+    &:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+        transform: none;
+        box-shadow: none;
+    }
 `
 
 export default StyledButton

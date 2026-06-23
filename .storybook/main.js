@@ -1,8 +1,14 @@
-module.exports = {
-  stories: ['../src/**/*.stories.js'],
-  addons: [
-    '@storybook/preset-create-react-app',
-    '@storybook/addon-actions',
-    '@storybook/addon-links',
-  ],
-};
+const config = {
+  stories: ['../src/**/*.stories.@(js|jsx)'],
+  addons: ['@storybook/addon-essentials'],
+  framework: {
+    name: '@storybook/react-vite',
+    options: {},
+  },
+  staticDirs: ['../public'],
+  typescript: {
+    reactDocgen: false,
+  },
+}
+
+export default config

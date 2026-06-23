@@ -1,0 +1,6 @@
+[
+  { "id": "1", "name": "林凌", "avatar": "avatar-1", "status": "online", "lastMessage": "忙着写Bug呢" },
+  { "id": "2", "name": "小天", "avatar": "avatar-2", "status": "offline", "lastMessage": "Hi～忙什么呢？" },
+  { "id": "3", "name": "张三", "avatar": "avatar-1", "status": "online", "lastMessage": "晚上一起吃饭？" },
+  { "id": "4", "name": "李四", "avatar": "avatar-2", "status": "offline", "lastMessage": "文件收到了" }
+]
