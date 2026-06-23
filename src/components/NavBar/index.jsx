@@ -16,7 +16,7 @@ function NavBar ({ children, ...rest }) {
             <Avatar src={avatarImg1} status='online' />
             <MenuItems>
                 <MenuItem to='/' showBadge icon={faCommentDots} />
-                <MenuItem to='/contcats' icon={faUsers} />
+                <MenuItem to='/contacts' icon={faUsers} />
                 <MenuItem to='/files' icon={faFolder} />
                 <MenuItem to='/notes' icon={faStickyNote} />
                 <MenuItem to=' ' icon={faEllipsisH} />
