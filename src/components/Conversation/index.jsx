@@ -29,7 +29,7 @@ function Conversation ({ onAvatarClick, onVideoClick, children, ...rest }) {
         delay: 300,
     })
 
-    const coversationAnimation = useSpring({
+    const conversationAnimation = useSpring({
         from: { opacity: 0, transform: 'translate3d(50px, 0px, 0px)' },
         to: { opacity: 1, transform: 'translate3d(0px, 0px, 0px)' },
         delay: 450,
@@ -48,7 +48,7 @@ function Conversation ({ onAvatarClick, onVideoClick, children, ...rest }) {
                 onVideoClick={onVideoClick}
                 titleBarAnimation={titleBarAnimation}
             />
-            <Conversations style={coversationAnimation}>
+            <Conversations style={conversationAnimation}>
                 {currentMessages.map((msg) =>
                     msg.from === userId ? (
                         <MyChatBubble key={msg.id} time={formatTime(msg.time)}>
