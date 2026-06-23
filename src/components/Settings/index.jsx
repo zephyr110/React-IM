@@ -8,13 +8,11 @@ import Icon from 'components/Icon'
 import Seperator from 'components/Seperator'
 import ArrowMenuRight from 'assets/icons/arrowRight.svg?react'
 import { Link } from 'react-router-dom'
-import 'styled-components/macro'
 import { useSpring, animated } from 'react-spring'
 function Settings ({ children, ...rest }) {
     const settingAnimation = useSpring({
-        transform: 'translate3d(0px, 0px, 0px)',
-        opacity: 1,
         from: { transform: 'translate3d(100px, 0px, 0px)', opacity: 0 },
+        to: { transform: 'translate3d(0px, 0px, 0px)', opacity: 1 },
         config: {
             tension: 140,
         },

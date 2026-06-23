@@ -11,23 +11,20 @@ import { useSpring } from 'react-spring'
 
 function Conversation ({ onAvatarClick, onVideoClick, children, ...rest }) {
     const titleBarAnimation = useSpring({
-        opacity: 1,
-        transform: 'translated3s(0px, 0px, 0px)',
-        from: { opacity: 0, transform: 'translated3d(0px, -50px, 0px)' },
+        from: { opacity: 0, transform: 'translate3d(0px, -50px, 0px)' },
+        to: { opacity: 1, transform: 'translate3d(0px, 0px, 0px)' },
         delay: 300,
     })
 
     const coversationAnimation = useSpring({
-        opacity: 1,
-        transform: 'translated3s(0px, 0px, 0px)',
-        from: { opacity: 0, transform: 'translated3d(50px, 0px, 0px)' },
+        from: { opacity: 0, transform: 'translate3d(50px, 0px, 0px)' },
+        to: { opacity: 1, transform: 'translate3d(0px, 0px, 0px)' },
         delay: 450,
     })
 
     const footerAnimation = useSpring({
-        opacity: 1,
-        transform: 'translated3s(0px, 0px, 0px)',
-        from: { opacity: 0, transform: 'translated3d(0px, 50px, 0px)' },
+        from: { opacity: 0, transform: 'translate3d(0px, 50px, 0px)' },
+        to: { opacity: 1, transform: 'translate3d(0px, 0px, 0px)' },
         delay: 600,
     })
 

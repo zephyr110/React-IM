@@ -22,7 +22,8 @@ function ChatApp ({ children, ...rest }) {
 
     const location = useLocation()
     const getFirstSgmPath = (location) => location.pathname.split('/')[1]
-    const transitions = useTransition(location, getFirstSgmPath, {
+    const transitions = useTransition(location, {
+        keys: getFirstSgmPath,
         from: { opacity: 0, transform: 'translate3d(-100px, 0, 0)' },
         enter: { opacity: 1, transform: 'translate3d(0, 0, 0)' },
         leave: { opacity: 0, transform: 'translate3d(-100px, 0, 1)' }
@@ -34,9 +35,9 @@ function ChatApp ({ children, ...rest }) {
                 <NavBar />
             </Nav>
             <Sidebar>
-                {transitions.map(({ item: location, props, key }) => (
-                    <animated.div key={key} style={props}>
-                        <Routes location={location}>
+                {transitions((style, item) => (
+                    <animated.div style={style}>
+                        <Routes location={item}>
                             <Route path="/" element={<MessageList />} />
                             <Route path="/contacts" element={<ConcatList />} />
                             <Route path="/files" element={<FileList />} />

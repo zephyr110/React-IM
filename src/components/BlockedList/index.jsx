@@ -4,7 +4,6 @@ import StyledBlockedList, { SettingsMenu, ClosableAvatar, BlockedAvatar, Blocked
 import Icon from 'components/Icon'
 import Text from 'components/Text'
 import ArrowMenuLeft from 'assets/icons/arrowMenuLeft.svg?react'
-import 'styled-components/macro'
 import avatarImg1 from 'assets/images/avatar-1.jpg'
 import closeCircle from 'assets/icons/closeCircle.svg?react'
 import { useNavigate } from 'react-router-dom'

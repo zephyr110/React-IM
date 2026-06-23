@@ -6,7 +6,6 @@ import Badge from 'components/Badge';
 import Avatar from 'components/Avatar';
 import avatarImg1 from 'assets/images/avatar-1.jpg'
 import { faCommentDots, faUsers, faFolder, faCog, faEllipsisH, faStickyNote } from '@fortawesome/free-solid-svg-icons';
-import 'styled-components/macro'
 import { Link, matchPath, useLocation } from 'react-router-dom'
 
 function NavBar ({ children, ...rest }) {

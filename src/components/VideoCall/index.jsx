@@ -8,7 +8,6 @@ import Avatar from 'components/Avatar'
 import Paragraph from 'components/Paragraph'
 import avatarImg1 from 'assets/images/avatar-1.jpg'
 import avatarImg2 from 'assets/images/avatar-2.jpg'
-import 'styled-components/macro'
 import Text from 'components/Text'
 function VideoCall ({ onHangOffClick, children, ...rest }) {
     const [fullScreen, setFullScreen] = useState(true)
