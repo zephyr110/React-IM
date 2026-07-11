@@ -56,6 +56,28 @@ export function MessageProvider ({ children }) {
     })
   }, [activeContactId, emit])
 
+  const sendVoiceMessage = useCallback((audioBlob, duration) => {
+    if (!activeContactId || !audioBlob) return
+    const reader = new FileReader()
+    reader.onloadend = () => {
+      const base64Audio = reader.result
+      emit('message:send', {
+        to: activeContactId,
+        content: base64Audio,
+        type: 'voice',
+        duration: duration,
+      }, (res) => {
+        if (res?.success) {
+          setMessages(prev => ({
+            ...prev,
+            [activeContactId]: [...(prev[activeContactId] || []), res.message],
+          }))
+        }
+      })
+    }
+    reader.readAsDataURL(audioBlob)
+  }, [activeContactId, emit])
+
   const loadHistory = useCallback((contactId) => {
     emit('message:history', { with: contactId }, (history) => {
       setMessages(prev => ({
@@ -70,6 +92,10 @@ export function MessageProvider ({ children }) {
     loadHistory(contactId)
   }, [loadHistory])
 
+  const closeConversation = useCallback(() => {
+    setActiveContactId(null)
+  }, [])
+
   return (
     <MessageContext.Provider value={{
       contacts,
@@ -78,7 +104,9 @@ export function MessageProvider ({ children }) {
       connected,
       userId,
       sendTextMessage,
+      sendVoiceMessage,
       openConversation,
+      closeConversation,
       loadHistory,
     }}>
       {children}

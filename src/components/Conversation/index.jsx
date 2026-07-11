@@ -10,7 +10,7 @@ import { useMessages } from 'context/MessageContext'
 
 
 function Conversation ({ onAvatarClick, onVideoClick, children, ...rest }) {
-    const { messages, activeContactId, userId } = useMessages()
+    const { messages, activeContactId, userId, closeConversation } = useMessages()
     const currentMessages = activeContactId ? (messages[activeContactId] || []) : []
 
     const formatTime = (timeStr) => {
@@ -46,18 +46,22 @@ function Conversation ({ onAvatarClick, onVideoClick, children, ...rest }) {
             <TitleBar
                 onAvatarClick={onAvatarClick}
                 onVideoClick={onVideoClick}
+                onCloseConversation={closeConversation}
                 titleBarAnimation={titleBarAnimation}
             />
             <Conversations style={conversationAnimation}>
                 {currentMessages.map((msg) =>
                     msg.from === userId ? (
                         <MyChatBubble key={msg.id} time={formatTime(msg.time)}>
-                            {msg.content}
+                            {msg.type === 'voice'
+                                ? <VoiceMessage type='mine' time={(typeof msg.duration === 'number' ? `${msg.duration}"` : msg.duration) || msg.content} audioSrc={msg.content && msg.content.startsWith('data:') ? msg.content : null} />
+                                : msg.content
+                            }
                         </MyChatBubble>
                     ) : (
                         <ChatBubble key={msg.id} time={formatTime(msg.time)}>
                             {msg.type === 'voice'
-                                ? <VoiceMessage time={msg.content} />
+                                ? <VoiceMessage time={(typeof msg.duration === 'number' ? `${msg.duration}"` : msg.duration) || msg.content} audioSrc={msg.content && msg.content.startsWith('data:') ? msg.content : null} />
                                 : msg.content
                             }
                         </ChatBubble>
@@ -73,9 +77,9 @@ function Conversation ({ onAvatarClick, onVideoClick, children, ...rest }) {
 }
 
 Conversation.propTypes = {
-    children: PropTypes.any
+    children: PropTypes.any,
+    onAvatarClick: PropTypes.func,
+    onVideoClick: PropTypes.func,
 }
 
 export default Conversation
-
-
