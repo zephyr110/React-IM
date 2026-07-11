@@ -3,6 +3,7 @@ import PropTypes from 'prop-types'
 import StyledEditProfile, { GroupTitle, GenderAndRegion, SelectGroup, StyledIconInput } from './style'
 import Profile from 'components/Profile'
 import Avatar from 'components/Avatar'
+import useProfile from 'hooks/useProfile'
 // import avatarImg1 from 'assets/images/avatar-1.jpg'
 import Button from 'components/Button'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
@@ -18,24 +19,35 @@ import Icon from 'components/Icon'
 
 function EditProfile ({ children, src, ...rest }) {
     const [showEdit, setShowEdit] = useState(false)
+    const { profile, updateProfile } = useProfile()
+    const [form, setForm] = useState(profile)
 
     if (!showEdit) {
         return (
             <Profile
-                onEdit={() => setShowEdit(true)}
+                onEdit={() => {
+                    setForm(profile)
+                    setShowEdit(true)
+                }}
                 showEditBtn
                 showCloseIcon={false}
                 src={src}
             />
         )
     }
+
+    const handleSave = () => {
+        updateProfile(form)
+        setShowEdit(false)
+    }
+
     return (
         <StyledEditProfile {...rest}>
             <Avatar
                 src={src}
                 size='160px'
                 css={`
-                    grid-area: 1 / 1 / 3 / 2; 
+                    grid-area: 1 / 1 / 3 / 2;
                     justify-self: center;
                     margin-bottom: 12px;
                 `}
@@ -51,15 +63,15 @@ function EditProfile ({ children, src, ...rest }) {
                     z-index: 10;
                 `}
             >
-                <FontAwesomeIcon icon={faCheck} style={{transform: 'scale(2)'}} onClick={() => setShowEdit(false)} />
+                <FontAwesomeIcon icon={faCheck} style={{transform: 'scale(2)'}} onClick={handleSave} />
             </Button>
 
             <GroupTitle>基本信息</GroupTitle>
-            <InputText label='昵称' />
+            <InputText label='昵称' value={form.name} onChange={e => setForm({...form, name: e.target.value})} />
             <GenderAndRegion>
                 <Radio.Group label='性别'>
-                    <Radio name='gender'>男</Radio>
-                    <Radio name='gender'>女</Radio>
+                    <Radio name='gender' checked={form.gender === '男'} onChange={() => setForm({...form, gender: '男'})}>男</Radio>
+                    <Radio name='gender' checked={form.gender === '女'} onChange={() => setForm({...form, gender: '女'})}>女</Radio>
                 </Radio.Group>
                 <LabelContainer label='地区'>
                     <SelectGroup>
@@ -75,17 +87,17 @@ function EditProfile ({ children, src, ...rest }) {
                     </SelectGroup>
                 </LabelContainer>
             </GenderAndRegion>
-            <InputText label='个性签名' />
+            <InputText label='个性签名' value={form.signature} onChange={e => setForm({...form, signature: e.target.value})} />
 
             <GroupTitle>联系信息</GroupTitle>
-            <InputText label='联系电话' />
-            <InputText label='电子邮箱' />
-            <InputText label='个人网站' />
+            <InputText label='联系电话' value={form.phone} onChange={e => setForm({...form, phone: e.target.value})} />
+            <InputText label='电子邮箱' value={form.email} onChange={e => setForm({...form, email: e.target.value})} />
+            <InputText label='个人网站' value={form.website} onChange={e => setForm({...form, website: e.target.value})} />
 
             <GroupTitle>社交信息</GroupTitle>
-            <IconInput icon={faWeibo} bgColor='#f06767' />
-            <IconInput icon={faGithub} bgColor='#000' />
-            <IconInput icon={faLinkedin} bgColor='#2483c0' />
+            <IconInput icon={faWeibo} bgColor='#f06767' value={form.weibo} onChange={e => setForm({...form, weibo: e.target.value})} />
+            <IconInput icon={faGithub} bgColor='#000' value={form.github} onChange={e => setForm({...form, github: e.target.value})} />
+            <IconInput icon={faLinkedin} bgColor='#2483c0' value={form.linkedin} onChange={e => setForm({...form, linkedin: e.target.value})} />
         </StyledEditProfile>
     )
 }

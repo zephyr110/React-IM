@@ -2,6 +2,7 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import StyledProfile, { SocialLinks, ContactSection, AlbumSection, AlbumTitle, Album, Photo, CloseIcon } from './style'
 import Avatar from 'components/Avatar'
+import useProfile from 'hooks/useProfile'
 // import avatarImg2 from 'assets/images/avatar-2.jpg'
 import Paragraph from 'components/Paragraph'
 import Emoji from 'components/Emoji'
@@ -28,6 +29,7 @@ function Profile ({
     name,
     ...rest
 }) {
+    const { profile } = useProfile()
     return (
         <StyledProfile {...rest}>
             {showCloseIcon && <CloseIcon icon={Cross} onClick={onCloseClick} />}
@@ -67,7 +69,7 @@ function Profile ({
                     margin-bottom: 12px;
                 `}
             >
-                {name}
+                {name || profile.name || '未设置昵称'}
             </Paragraph>
             <Paragraph
                 size='medium'
@@ -76,7 +78,7 @@ function Profile ({
                     margin-bottom: 12px;
                 `}
             >
-                北京市 海淀区
+                {profile.region}
             </Paragraph>
             <Paragraph
                 css={`
@@ -84,9 +86,7 @@ function Profile ({
                     text-align: center;
                 `}
             >
-                前端小白，努力让自己在前端的路上走更远一些{' '}
-                {/* eslint-disable jsx-a11y/accessible-emoji */}
-                <Emoji label='fist'> ✊ 💪 💯</Emoji>
+                {profile.signature}
             </Paragraph>
             <SocialLinks>
                 <Icon.Social
@@ -109,9 +109,9 @@ function Profile ({
                 `}
             />
             <ContactSection>
-                <Description label='联系电话'>+86 18612345667</Description>
-                <Description label='电子邮件'>admin@gmail.com</Description>
-                <Description label='个人网站'>https://www.baidu.com</Description>
+                <Description label='联系电话'>{profile.phone}</Description>
+                <Description label='电子邮件'>{profile.email}</Description>
+                <Description label='个人网站'>{profile.website}</Description>
             </ContactSection>
             <Seperator
                 css={`
