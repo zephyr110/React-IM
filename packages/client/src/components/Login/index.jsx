@@ -4,7 +4,7 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { cn } from '@/lib/utils'
-import { MessageCircle, Loader2, ChevronLeft } from 'lucide-react'
+import { Loader2, ChevronLeft } from 'lucide-react'
 import { useSocket } from 'context/SocketContext'
 
 const API = 'http://localhost:4000'
@@ -42,9 +42,7 @@ function Login ({ onLogin, onSwitchToRegister }) {
       {/* Left panel - branding */}
       <div className='hidden lg:flex flex-col justify-between bg-muted/50 p-10'>
         <div className='flex items-center gap-2 text-lg font-medium'>
-          <div className='w-8 h-8 rounded-lg bg-primary flex items-center justify-center'>
-            <MessageCircle className='w-5 h-5 text-primary-foreground' />
-          </div>
+          <img src='/logo.svg' alt='Echo' className='w-8 h-8' />
           Echo
         </div>
         <div className='space-y-4'>
@@ -160,9 +158,7 @@ function Register ({ onLogin, onBack }) {
     <div className='grid min-h-svh lg:grid-cols-2'>
       <div className='hidden lg:flex flex-col justify-between bg-muted/50 p-10'>
         <div className='flex items-center gap-2 text-lg font-medium'>
-          <div className='w-8 h-8 rounded-lg bg-primary flex items-center justify-center'>
-            <MessageCircle className='w-5 h-5 text-primary-foreground' />
-          </div>
+          <img src='/logo.svg' alt='Echo' className='w-8 h-8' />
           Echo
         </div>
         <div className='space-y-4'>

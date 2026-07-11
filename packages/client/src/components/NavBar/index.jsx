@@ -44,6 +44,11 @@ function NavBar () {
 
   return (
     <nav className='flex flex-col items-center h-full py-4 px-2 gap-1 bg-secondary/30 border-r'>
+      {/* Logo */}
+      <div className='mb-3'>
+        <img src='/logo.svg' alt='Echo' className='w-10 h-10' />
+      </div>
+
       {/* Nav items */}
       {NAV_ITEMS.map(({ to, icon: Icon, label }) => {
         const isActive = to === '/'
