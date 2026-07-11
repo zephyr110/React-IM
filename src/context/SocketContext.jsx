@@ -10,28 +10,46 @@ export function SocketProvider ({ children }) {
   const [connected, setConnected] = useState(false)
   const [userId, setUserId] = useState(null)
 
-  useEffect(() => {
+  // 在 render 阶段同步创建 socket，确保子组件（MessageProvider）的 effect
+  // 执行时 socketRef.current 已经指向可用的 socket 实例
+  if (socketRef.current === null) {
     const socket = io(SOCKET_URL, {
       autoConnect: true,
       reconnection: true,
       reconnectionDelay: 1000,
       reconnectionAttempts: 10,
     })
+    socketRef.current = socket
+  }
 
-    socket.on('connect', () => {
+  useEffect(() => {
+    const socket = socketRef.current
+    if (!socket) return
+
+    const handleConnect = () => {
       console.log('[socket] connected:', socket.id)
       setConnected(true)
-    })
+    }
 
-    socket.on('disconnect', (reason) => {
+    const handleDisconnect = (reason) => {
       console.log('[socket] disconnected:', reason)
       setConnected(false)
-    })
+    }
 
-    socketRef.current = socket
+    if (socket.connected) {
+      setConnected(true)
+    }
 
+    socket.on('connect', handleConnect)
+    socket.on('disconnect', handleDisconnect)
+
+    // 不在 cleanup 中调用 socket.disconnect()，因为 React StrictMode
+    // 在开发环境下会 double-invoke effect（mount → unmount → mount），
+    // disconnect() 会永久关闭重连。socket 在 render 阶段创建，生命周期
+    // 与组件实例一致，浏览器关闭时 socket 会自动断开。
     return () => {
-      socket.disconnect()
+      socket.off('connect', handleConnect)
+      socket.off('disconnect', handleDisconnect)
     }
   }, [])
 
@@ -55,8 +73,12 @@ export function SocketProvider ({ children }) {
   }, [])
 
   const on = useCallback((event, handler) => {
-    socketRef.current?.on(event, handler)
-    return () => socketRef.current?.off(event, handler)
+    const socket = socketRef.current
+    if (!socket) return () => {}
+    socket.on(event, handler)
+    return () => {
+      socket.off(event, handler)
+    }
   }, [])
 
   return (

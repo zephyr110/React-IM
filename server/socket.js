@@ -25,7 +25,7 @@ function getContacts () {
   return readJSON(CONTACTS_FILE)
 }
 
-function addMessage ({ from, to, content, type = 'text', time }) {
+function addMessage ({ from, to, content, type = 'text', time, duration }) {
   const messages = getMessages()
   const roomKey = [from, to].sort().join('-')
   if (!messages[roomKey]) messages[roomKey] = []
@@ -36,6 +36,10 @@ function addMessage ({ from, to, content, type = 'text', time }) {
     content,
     type,
     time: time || new Date().toISOString(),
+  }
+  // 语音消息携带时长信息
+  if (duration != null) {
+    msg.duration = duration
   }
   messages[roomKey].push(msg)
   if (messages[roomKey].length > 200) {
@@ -71,13 +75,14 @@ function setupSocket (io) {
       socket.emit('contacts', contacts)
     })
 
-    socket.on('message:send', ({ to, content, type }, callback) => {
+    socket.on('message:send', ({ to, content, type, duration }, callback) => {
       if (!socket.userId) return
       const msg = addMessage({
         from: socket.userId,
         to,
         content,
         type,
+        duration,
       })
 
       const targetSocketId = onlineUsers.get(to)
