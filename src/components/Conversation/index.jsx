@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect, useCallback } from 'react'
 import PropTypes from 'prop-types'
 import StyledConversation, { Conversations, MyChatBubble } from './style'
 import TitleBar from 'components/TitleBar'
@@ -41,6 +41,18 @@ function Conversation ({ onAvatarClick, onVideoClick, children, ...rest }) {
         delay: 600,
     })
 
+    // Keyboard shortcuts
+    useEffect(() => {
+        const handleKeyDown = (e) => {
+            // Esc: close conversation
+            if (e.key === 'Escape' && activeContactId) {
+                closeConversation()
+            }
+        }
+        window.addEventListener('keydown', handleKeyDown)
+        return () => window.removeEventListener('keydown', handleKeyDown)
+    }, [activeContactId, closeConversation])
+
     return (
         <StyledConversation {...rest}>
             <TitleBar
@@ -52,17 +64,21 @@ function Conversation ({ onAvatarClick, onVideoClick, children, ...rest }) {
             <Conversations style={conversationAnimation}>
                 {currentMessages.map((msg) =>
                     msg.from === userId ? (
-                        <MyChatBubble key={msg.id} time={formatTime(msg.time)}>
+                        <MyChatBubble key={msg.id} time={formatTime(msg.time)} message={msg}>
                             {msg.type === 'voice'
                                 ? <VoiceMessage type='mine' time={(typeof msg.duration === 'number' ? `${msg.duration}"` : msg.duration) || msg.content} audioSrc={msg.content && msg.content.startsWith('data:') ? msg.content : null} />
-                                : msg.content
+                                : msg.type === 'image'
+                                    ? null  // image handled by ChatBubble internally via message prop
+                                    : msg.content
                             }
                         </MyChatBubble>
                     ) : (
-                        <ChatBubble key={msg.id} time={formatTime(msg.time)}>
+                        <ChatBubble key={msg.id} time={formatTime(msg.time)} message={msg}>
                             {msg.type === 'voice'
                                 ? <VoiceMessage time={(typeof msg.duration === 'number' ? `${msg.duration}"` : msg.duration) || msg.content} audioSrc={msg.content && msg.content.startsWith('data:') ? msg.content : null} />
-                                : msg.content
+                                : msg.type === 'image'
+                                    ? null  // image handled by ChatBubble internally via message prop
+                                    : msg.content
                             }
                         </ChatBubble>
                     )
