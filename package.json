@@ -2,55 +2,16 @@
   "name": "react-im",
   "version": "0.1.0",
   "private": true,
-  "homepage": "./",
-  "dependencies": {
-    "@fortawesome/fontawesome-svg-core": "^7.2.0",
-    "@fortawesome/free-brands-svg-icons": "^7.2.0",
-    "@fortawesome/free-regular-svg-icons": "^7.2.0",
-    "@fortawesome/free-solid-svg-icons": "^7.2.0",
-    "@fortawesome/react-fontawesome": "^3.3.1",
-    "cors": "^2.8.6",
-    "express": "^5.2.1",
-    "hygen": "^5.0.3",
-    "prop-types": "^15.8.1",
-    "react": "18",
-    "react-dom": "18",
-    "react-router-dom": "6",
-    "react-spring": "9",
-    "socket.io": "^4.8.3",
-    "socket.io-client": "^4.8.3",
-    "styled-components": "6"
-  },
   "scripts": {
-    "start": "vite",
-    "build": "vite build",
-    "preview": "vite preview",
-    "test": "vitest",
-    "storybook": "storybook dev -p 6006",
-    "build-storybook": "storybook build",
-    "deploy": "gh-pages -d dist",
-    "server": "node server/index.js",
-    "dev": "concurrently \"pnpm server\" \"pnpm start\""
-  },
-  "pnpm": {
-    "onlyBuiltDependencies": ["esbuild", "fsevents", "ejs"]
+    "dev": "concurrently \"pnpm --filter @react-im/server dev\" \"pnpm --filter @react-im/client start\"",
+    "build": "pnpm --filter @react-im/client build",
+    "start": "pnpm --filter @react-im/client start",
+    "server": "pnpm --filter @react-im/server start",
+    "test": "pnpm --filter @react-im/client test",
+    "storybook": "pnpm --filter @react-im/client storybook",
+    "deploy": "pnpm --filter @react-im/client deploy"
   },
   "devDependencies": {
-    "@babel/preset-react": "^7.26.0",
-    "@storybook/addon-essentials": "^8.6.18",
-    "@storybook/react-vite": "^8.6.18",
-    "@testing-library/dom": "^10.4.1",
-    "@testing-library/jest-dom": "^6.9.1",
-    "@testing-library/react": "^16.3.2",
-    "@testing-library/user-event": "^14.6.1",
-    "@vitejs/plugin-react": "4",
-    "babel-plugin-macros": "^3.1.0",
-    "concurrently": "^10.0.3",
-    "gh-pages": "^3.1.0",
-    "jsdom": "^29.1.1",
-    "storybook": "^8.6.18",
-    "vite": "5",
-    "vite-plugin-svgr": "^5.2.0",
-    "vitest": "2"
+    "concurrently": "^10.0.3"
   }
 }
