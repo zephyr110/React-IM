@@ -17,12 +17,12 @@ export default {
     inactiveColor: 'rgba(41, 47, 76, 0.3)',
     inactiveColorDark: '#ffffff',
 
-    normal: '1.4rem',
-    medium: '1.6rem',
-    large: '1.8rem',
-    xlarge: '2rem',
-    xxlarge: '2.4rem',
-    small: '1.2rem',
-    xsmall: '1rem',
-    xxsmall: '0.8rem'
+    normal: '14px',
+    medium: '16px',
+    large: '18px',
+    xlarge: '20px',
+    xxlarge: '24px',
+    small: '12px',
+    xsmall: '10px',
+    xxsmall: '8px'
 }
