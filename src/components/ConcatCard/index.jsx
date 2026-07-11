@@ -15,9 +15,9 @@ function getAvatarSrc(avatar) {
     return map[avatar] || avatarImg
 }
 
-function ConcatCard ({ avatar, name, intro, status, children, ...rest }) {
+function ConcatCard ({ avatar, name, intro, status, onClick, children, ...rest }) {
     return (
-        <StyledConcatCard {...rest}>
+        <StyledConcatCard onClick={onClick} {...rest}>
             <Avatar src={getAvatarSrc(avatar)} status={status} />
             <Name>{name}</Name>
             <Intro>{intro}</Intro>
@@ -32,6 +32,7 @@ ConcatCard.propTypes = {
     name: PropTypes.string,
     intro: PropTypes.string,
     status: PropTypes.string,
+    onClick: PropTypes.func,
 }
 
 export default ConcatCard

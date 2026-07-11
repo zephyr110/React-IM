@@ -9,7 +9,7 @@ import { animated } from 'react-spring'
 import { useMessages } from 'context/MessageContext'
 
 function ConcatList ({ children, ...rest }) {
-    const { contacts } = useMessages()
+    const { contacts, openConversation } = useMessages()
     const trailAnimation = useStaggeredList(contacts.length || 1)
 
     return (
@@ -27,6 +27,7 @@ function ConcatList ({ children, ...rest }) {
                                 name={contact.name}
                                 intro={contact.intro}
                                 status={contact.online ? 'online' : 'offline'}
+                                onClick={() => openConversation(contact.id)}
                             />
                         </animated.div>
                     ))}

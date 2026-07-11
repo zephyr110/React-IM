@@ -22,6 +22,11 @@ const StyledConcatCard = styled.div`
          grid-area: avatar;
      }
      margin: -70px 0;
+     cursor: pointer;
+     &:hover {
+         background: ${({ theme }) => theme.gray2};
+         border-radius: 8px;
+     }
 `
 
 export default StyledConcatCard
