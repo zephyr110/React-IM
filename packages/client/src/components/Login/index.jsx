@@ -45,7 +45,7 @@ function Login ({ onLogin, onSwitchToRegister }) {
           <div className='w-8 h-8 rounded-lg bg-primary flex items-center justify-center'>
             <MessageCircle className='w-5 h-5 text-primary-foreground' />
           </div>
-          React IM
+          Echo
         </div>
         <div className='space-y-4'>
           <h2 className='text-2xl font-semibold leading-tight'>
@@ -57,7 +57,7 @@ function Login ({ onLogin, onSwitchToRegister }) {
           </p>
         </div>
         <div className='text-xs text-muted-foreground'>
-          © 2026 React IM
+          © 2026 Echo
         </div>
       </div>
 
@@ -70,7 +70,7 @@ function Login ({ onLogin, onSwitchToRegister }) {
               <div className='w-8 h-8 rounded-lg bg-primary flex items-center justify-center'>
                 <MessageCircle className='w-5 h-5 text-primary-foreground' />
               </div>
-              React IM
+              Echo
             </div>
           </div>
 
@@ -163,7 +163,7 @@ function Register ({ onLogin, onBack }) {
           <div className='w-8 h-8 rounded-lg bg-primary flex items-center justify-center'>
             <MessageCircle className='w-5 h-5 text-primary-foreground' />
           </div>
-          React IM
+          Echo
         </div>
         <div className='space-y-4'>
           <h2 className='text-2xl font-semibold leading-tight'>
@@ -173,7 +173,7 @@ function Register ({ onLogin, onBack }) {
             创建你的账号，与朋友、同事实时沟通。
           </p>
         </div>
-        <div className='text-xs text-muted-foreground'>© 2026 React IM</div>
+        <div className='text-xs text-muted-foreground'>© 2026 Echo</div>
       </div>
 
       <div className='flex items-center justify-center p-6 md:p-10'>
@@ -186,7 +186,7 @@ function Register ({ onLogin, onBack }) {
               <div className='w-8 h-8 rounded-lg bg-primary flex items-center justify-center'>
                 <MessageCircle className='w-5 h-5 text-primary-foreground' />
               </div>
-              React IM
+              Echo
             </div>
           </div>
 

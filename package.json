@@ -1,15 +1,15 @@
 {
-  "name": "react-im",
+  "name": "echo",
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "concurrently \"pnpm --filter @react-im/server dev\" \"pnpm --filter @react-im/client start\"",
-    "build": "pnpm --filter @react-im/client build",
-    "start": "pnpm --filter @react-im/client start",
-    "server": "pnpm --filter @react-im/server start",
-    "test": "pnpm --filter @react-im/client test",
-    "storybook": "pnpm --filter @react-im/client storybook",
-    "deploy": "pnpm --filter @react-im/client deploy"
+    "dev": "concurrently \"pnpm --filter @echo/server dev\" \"pnpm --filter @echo/client start\"",
+    "build": "pnpm --filter @echo/client build",
+    "start": "pnpm --filter @echo/client start",
+    "server": "pnpm --filter @echo/server start",
+    "test": "pnpm --filter @echo/client test",
+    "storybook": "pnpm --filter @echo/client storybook",
+    "deploy": "pnpm --filter @echo/client deploy"
   },
   "devDependencies": {
     "concurrently": "^10.0.3"

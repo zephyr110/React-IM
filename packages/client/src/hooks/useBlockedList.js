@@ -1,6 +1,6 @@
 import { useState, useCallback } from 'react'
 
-const STORAGE_KEY = 'react-im-blocked'
+const STORAGE_KEY = 'echo-blocked'
 
 function loadBlocked () {
   try {

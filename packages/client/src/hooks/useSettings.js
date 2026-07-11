@@ -1,6 +1,6 @@
 import { useState, useCallback } from 'react'
 
-const STORAGE_KEY = 'react-im-settings'
+const STORAGE_KEY = 'echo-settings'
 
 const defaultSettings = {
   newMessageNotification: true,

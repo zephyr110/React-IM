@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from 'react'
 
-const STORAGE_KEY = 'react-im-theme'
+const STORAGE_KEY = 'echo-theme'
 
 export default function useAppTheme () {
   const [theme, setThemeState] = useState(() => {
