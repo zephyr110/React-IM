@@ -1,5 +1,4 @@
-
-import React from 'react'
+import React, { useState, useMemo } from 'react'
 import PropTypes from 'prop-types'
 import StyledMessageList, { ChatList } from './style'
 import MessageCard from 'components/MessageCard'
@@ -15,17 +14,32 @@ function getAvatarSrc(avatar) {
 }
 
 function MessageList ({ children, ...rest }) {
-    const { contacts, activeContactId, openConversation, messages } = useMessages()
-    const trailAnimation = useStaggeredList(contacts.length || 1)
+    const { contacts, activeContactId, openConversation, messages, unreadCounts } = useMessages()
+    const [searchText, setSearchText] = useState('')
+
+    const filteredContacts = useMemo(() => {
+        if (!searchText.trim()) return contacts
+        const keyword = searchText.trim().toLowerCase()
+        return contacts.filter(contact => {
+            if (contact.name.toLowerCase().includes(keyword)) return true
+            const contactMsgs = messages[contact.id] || []
+            return contactMsgs.some(m =>
+                m.type === 'text' && m.content.toLowerCase().includes(keyword)
+            )
+        })
+    }, [contacts, messages, searchText])
+
+    const trailAnimation = useStaggeredList(filteredContacts.length || 1)
 
     return (
         <StyledMessageList {...rest}>
             <FilterList
                 options={['最新消息优先', '在线好友优先']}
                 actionLabel='创建会话'
+                onSearch={setSearchText}
             >
                 <ChatList>
-                    {contacts.map((contact, index) => {
+                    {filteredContacts.map((contact, index) => {
                         const contactMsgs = messages[contact.id] || []
                         const lastMsg = contactMsgs[contactMsgs.length - 1]
                         return (
@@ -40,7 +54,7 @@ function MessageList ({ children, ...rest }) {
                                     statusText={contact.online ? '在线' : '离线'}
                                     time={lastMsg?.time || ''}
                                     message={lastMsg?.content || contact.lastMessage || ''}
-                                    unreadCount={0}
+                                    unreadCount={unreadCounts?.[contact.id] || 0}
                                     onClick={() => openConversation(contact.id)}
                                 />
                             </animated.div>
@@ -55,7 +69,4 @@ function MessageList ({ children, ...rest }) {
 MessageList.propTypes = {
     children: PropTypes.any
 }
-
 export default MessageList
-
-

@@ -8,6 +8,7 @@ export function MessageProvider ({ children }) {
   const [contacts, setContacts] = useState([])
   const [messages, setMessages] = useState({})
   const [activeContactId, setActiveContactId] = useState(null)
+  const [unreadCounts, setUnreadCounts] = useState({})
 
   // 监听联系人列表
   useEffect(() => {
@@ -25,9 +26,14 @@ export function MessageProvider ({ children }) {
         ...prev,
         [otherId]: [...(prev[otherId] || []), msg],
       }))
+      // Increment unread count if not currently chatting with sender
+      setUnreadCounts(prev => {
+        if (otherId === activeContactId) return prev
+        return { ...prev, [otherId]: (prev[otherId] || 0) + 1 }
+      })
     })
     return cleanup
-  }, [on])
+  }, [on, activeContactId])
 
   // 监听用户上线/下线
   useEffect(() => {
@@ -90,6 +96,12 @@ export function MessageProvider ({ children }) {
   const openConversation = useCallback((contactId) => {
     setActiveContactId(contactId)
     loadHistory(contactId)
+    setUnreadCounts(prev => {
+      if (!prev[contactId]) return prev
+      const next = { ...prev }
+      delete next[contactId]
+      return next
+    })
   }, [loadHistory])
 
   const closeConversation = useCallback(() => {
@@ -100,6 +112,7 @@ export function MessageProvider ({ children }) {
     <MessageContext.Provider value={{
       contacts,
       messages,
+      unreadCounts,
       activeContactId,
       connected,
       userId,
