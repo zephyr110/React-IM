@@ -25,7 +25,7 @@ function getContacts () {
   return readJSON(CONTACTS_FILE)
 }
 
-function addMessage ({ from, to, content, type = 'text', time, duration }) {
+function addMessage ({ from, to, content, type = 'text', time, duration, quote }) {
   const messages = getMessages()
   const roomKey = [from, to].sort().join('-')
   if (!messages[roomKey]) messages[roomKey] = []
@@ -41,6 +41,7 @@ function addMessage ({ from, to, content, type = 'text', time, duration }) {
   if (duration != null) {
     msg.duration = duration
   }
+  if (quote) msg.quote = quote
   messages[roomKey].push(msg)
   if (messages[roomKey].length > 200) {
     messages[roomKey] = messages[roomKey].slice(-200)
@@ -75,7 +76,7 @@ function setupSocket (io) {
       socket.emit('contacts', contacts)
     })
 
-    socket.on('message:send', ({ to, content, type, duration }, callback) => {
+    socket.on('message:send', ({ to, content, type, duration, quote }, callback) => {
       if (!socket.userId) return
       const msg = addMessage({
         from: socket.userId,
@@ -83,6 +84,7 @@ function setupSocket (io) {
         content,
         type,
         duration,
+        quote,
       })
 
       const targetSocketId = onlineUsers.get(to)
@@ -96,6 +98,43 @@ function setupSocket (io) {
       if (!socket.userId) return
       const history = getHistory(socket.userId, otherId)
       if (callback) callback(history)
+    })
+
+    // 消息撤回（2分钟内）
+    socket.on('message:revoke', ({ messageId, to }, callback) => {
+        if (!socket.userId) return
+        const messages = getMessages()
+        const roomKey = [socket.userId, to].sort().join('-')
+        const roomMessages = messages[roomKey] || []
+        const msg = roomMessages.find(m => m.id === messageId)
+
+        if (!msg || msg.from !== socket.userId) {
+          if (callback) callback({ success: false, error: '无权撤回' })
+          return
+        }
+
+        const elapsed = Date.now() - new Date(msg.time).getTime()
+        if (elapsed > 2 * 60 * 1000) {
+          if (callback) callback({ success: false, error: '超过2分钟无法撤回' })
+          return
+        }
+
+        msg.revoked = true
+        writeJSON(MESSAGES_FILE, messages)
+
+        const targetSocketId = onlineUsers.get(to)
+        if (targetSocketId) {
+          io.to(targetSocketId).emit('message:revoked', { messageId, roomKey })
+        }
+        if (callback) callback({ success: true, message: msg })
+    })
+
+    // 已读回执
+    socket.on('message:read', ({ from, messageId }) => {
+        const targetSocketId = onlineUsers.get(from)
+        if (targetSocketId) {
+          io.to(targetSocketId).emit('message:read', { messageId, readBy: socket.userId })
+        }
     })
 
     socket.on('typing', ({ to }) => {
