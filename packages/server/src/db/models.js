@@ -16,6 +16,39 @@ function getUser (id) {
   return db.prepare('SELECT * FROM users WHERE id = ?').get(id) || null
 }
 
+function findUserByName (name) {
+  const db = getDb()
+  return db.prepare('SELECT * FROM users WHERE name = ?').get(name) || null
+}
+
+function registerUser (name, password, avatar = 'avatar-1') {
+  const db = getDb()
+  const bcrypt = require('bcryptjs')
+  const existing = findUserByName(name)
+  if (existing) return { success: false, error: '用户名已存在' }
+
+  const id = require('crypto').randomUUID()
+  const passwordHash = bcrypt.hashSync(password, 10)
+
+  db.prepare(
+    'INSERT INTO users (id, name, avatar, password_hash) VALUES (?, ?, ?, ?)'
+  ).run(id, name, avatar, passwordHash)
+
+  return { success: true, user: { id, name, avatar } }
+}
+
+function authenticateUser (name, password) {
+  const db = getDb()
+  const bcrypt = require('bcryptjs')
+  const user = db.prepare('SELECT * FROM users WHERE name = ?').get(name)
+  if (!user) return { success: false, error: '用户不存在' }
+  if (!user.password_hash) return { success: false, error: '请先设置密码' }
+  if (!bcrypt.compareSync(password, user.password_hash)) {
+    return { success: false, error: '密码错误' }
+  }
+  return { success: true, user: { id: user.id, name: user.name, avatar: user.avatar } }
+}
+
 // ========== Contacts ==========
 
 function getContacts () {
@@ -113,6 +146,9 @@ function formatMessage (row) {
 module.exports = {
   createUser,
   getUser,
+  findUserByName,
+  registerUser,
+  authenticateUser,
   getContacts,
   getContact,
   addMessage,

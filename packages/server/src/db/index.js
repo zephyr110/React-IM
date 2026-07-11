@@ -22,8 +22,14 @@ function initSchema (db) {
       id TEXT PRIMARY KEY,
       name TEXT NOT NULL,
       avatar TEXT DEFAULT 'avatar-1',
+      password_hash TEXT,
       created_at TEXT DEFAULT (datetime('now'))
     );
+
+`);
+  // Migration-safe: add password_hash if column missing
+  try { db.exec(`ALTER TABLE users ADD COLUMN password_hash TEXT`) } catch {}
+  db.exec(`
 
     CREATE TABLE IF NOT EXISTS contacts (
       id TEXT PRIMARY KEY,

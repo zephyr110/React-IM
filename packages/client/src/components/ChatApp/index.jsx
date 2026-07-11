@@ -11,7 +11,7 @@ import EditProfile from 'components/EditProfile'
 import Settings from 'components/Settings'
 import BlockedList from 'components/BlockedList'
 import VideoCall from 'components/VideoCall'
-import Login from 'components/Login'
+import AuthPage from 'components/Login'
 import { useTransition, animated } from 'react-spring'
 import avatarImg1 from 'assets/images/avatar-1.jpg'
 import avatarImg2 from 'assets/images/avatar-2.jpg'
@@ -33,7 +33,7 @@ function ChatApp ({ children, ...rest }) {
     })
 
     if (!user) {
-        return <Login onLogin={setUser} />
+        return <AuthPage onLogin={setUser} />
     }
 
     return (

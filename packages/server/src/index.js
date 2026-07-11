@@ -4,7 +4,7 @@ const { Server } = require('socket.io')
 const cors = require('cors')
 const { setupSocket } = require('./socket')
 const { getDb } = require('./db')
-const { getUser, getContacts, getHistory } = require('./db/models')
+const { getUser, getContacts, getHistory, registerUser, authenticateUser } = require('./db/models')
 
 const app = express()
 const server = http.createServer(app)
@@ -45,6 +45,25 @@ app.get('/api/users/:id', (req, res) => {
 app.get('/api/messages/:user1/:user2', (req, res) => {
   const messages = getHistory(req.params.user1, req.params.user2)
   res.json(messages)
+})
+
+// Register
+app.post('/api/auth/register', (req, res) => {
+  const { name, password, avatar } = req.body
+  if (!name || !password) return res.status(400).json({ error: '用户名和密码不能为空' })
+  if (password.length < 4) return res.status(400).json({ error: '密码至少4位' })
+  const result = registerUser(name.trim(), password, avatar)
+  if (!result.success) return res.status(409).json({ error: result.error })
+  res.json(result.user)
+})
+
+// Login
+app.post('/api/auth/login', (req, res) => {
+  const { name, password } = req.body
+  if (!name || !password) return res.status(400).json({ error: '用户名和密码不能为空' })
+  const result = authenticateUser(name.trim(), password)
+  if (!result.success) return res.status(401).json({ error: result.error })
+  res.json(result.user)
 })
 
 // ====== Socket.IO ======

@@ -5,7 +5,7 @@ import Input from 'components/Input'
 import Filter from 'components/Filter'
 import Select from 'components/Select'
 import Option from 'components/Option'
-import Button from 'components/Button'
+import { Button } from '@/components/ui/button'
 import { Plus } from 'lucide-react'
 
 function FilterList ({
@@ -30,9 +30,9 @@ function FilterList ({
                     </Filter.Filters>
                 )}
                 {actionLabel && (
-                    <Filter.Action label='创建会话'>
-                        <Button>
-                            <Plus className="w-3 h-3" />
+                    <Filter.Action label={actionLabel}>
+                        <Button size='icon' variant='outline' className='w-8 h-8'>
+                            <Plus className='w-4 h-4' />
                         </Button>
                     </Filter.Action>
                 )}

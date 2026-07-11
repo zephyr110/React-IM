@@ -125,7 +125,7 @@ function Footer ({ footerAnimation, style, ...rest }) {
   // Recording state
   if (recordingState === 'recording') {
     return (
-      <div className='border-t bg-background px-4 py-3' {...rest}>
+      <div className='bg-background px-4 py-3' {...rest}>
         <div className='flex items-center gap-3'>
           <div className='flex-1 flex items-center gap-2 px-4 py-2 bg-red-50 rounded-full'>
             <span className='w-2 h-2 rounded-full bg-red-500 animate-pulse' />
@@ -142,7 +142,7 @@ function Footer ({ footerAnimation, style, ...rest }) {
 
   if (recordingState === 'done') {
     return (
-      <div className='border-t bg-background px-4 py-3' {...rest}>
+      <div className='bg-background px-4 py-3' {...rest}>
         <div className='flex items-center gap-3'>
           <div className='flex-1 flex items-center gap-2 px-4 py-2 bg-blue-50 rounded-full'>
             <span className='text-sm text-blue-600 font-medium'>{formatDuration(duration)}</span>
@@ -156,7 +156,7 @@ function Footer ({ footerAnimation, style, ...rest }) {
   }
 
   return (
-    <div className='border-t bg-background px-4 py-3' {...rest}>
+    <div className='bg-background px-4 py-3' {...rest}>
       {/* Quote bar */}
       {quoteMessage && (
         <div className='flex items-center gap-2 mb-2 px-3 py-1.5 bg-muted/50 rounded-lg text-xs text-muted-foreground'>
@@ -173,7 +173,7 @@ function Footer ({ footerAnimation, style, ...rest }) {
       )}
 
       {/* Input area */}
-      <div className='flex items-end gap-2'>
+      <div className='flex items-center gap-2'>
         {/* Clip button */}
         <Button variant='ghost' size='icon' className='shrink-0' onClick={() => fileInputRef.current?.click()} disabled={disabled}>
           <Paperclip className='w-5 h-5 text-muted-foreground' />
