@@ -15,6 +15,8 @@ import Dropdown from 'components/Dropdown'
 import { DropdownItem } from 'components/Dropdown/style'
 import Seperator from 'components/Seperator'
 import { useMessages } from 'context/MessageContext'
+import useBlockedList from 'hooks/useBlockedList'
+import { useToast } from 'hooks/useToast'
 
 function getAvatarSrc(avatar) {
     const map = {
@@ -27,13 +29,32 @@ function getAvatarSrc(avatar) {
 function TitleBar ({
     onAvatarClick,
     onVideoClick,
+    onCloseConversation,
     titleBarAnimation,
     style,
     children,
     ...rest
 }) {
     const { contacts, activeContactId } = useMessages()
+    const { blockContact } = useBlockedList()
+    const { showToast } = useToast()
     const activeContact = contacts.find(c => c.id === activeContactId)
+
+    const handleProfile = () => {
+        onAvatarClick && onAvatarClick()
+    }
+
+    const handleClose = () => {
+        onCloseConversation && onCloseConversation()
+    }
+
+    const handleBlock = () => {
+        if (activeContactId) {
+            blockContact(activeContactId)
+            showToast(`已屏蔽 ${activeContact?.name || activeContactId}`, 'warning')
+            onCloseConversation && onCloseConversation()
+        }
+    }
 
     return (
         <StyledTitleBar style={{ ...style, ...titleBarAnimation}} {...rest}>
@@ -55,30 +76,33 @@ function TitleBar ({
                 <Dropdown
                     content={
                         <>
-                            <DropdownItem>
+                            <DropdownItem onClick={handleProfile}>
                                 <Paragraph>个人资料</Paragraph>
                             </DropdownItem>
-                            <DropdownItem>
+                            <DropdownItem onClick={handleClose}>
                                 <Paragraph>关闭会话</Paragraph>
                             </DropdownItem>
                             <Seperator />
-                            <DropdownItem>
-                                <Paragraph type='danger' >屏蔽此人</Paragraph>
+                            <DropdownItem onClick={handleBlock}>
+                                <Paragraph type='danger'>屏蔽此人</Paragraph>
                             </DropdownItem>
                         </>
                     }
                 >
                     <Icon opacity={0.5} icon={Options} />
                 </Dropdown>
-
             </Actions>
         </StyledTitleBar>
     )
 }
+
 TitleBar.propTypes = {
-    children: PropTypes.any
+    children: PropTypes.any,
+    onAvatarClick: PropTypes.func,
+    onVideoClick: PropTypes.func,
+    onCloseConversation: PropTypes.func,
+    titleBarAnimation: PropTypes.object,
+    style: PropTypes.object,
 }
 
 export default TitleBar
-
-

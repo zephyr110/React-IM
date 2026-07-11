@@ -1,21 +1,19 @@
 
-import React from 'react'
+import React, { useState } from 'react'
 import PropTypes from 'prop-types'
 import StyledDropdown, { DropdownContainer } from './style'
-import { useState } from 'react'
 
-function Dropdown ({
-    content,
-    align = 'right',
-    children,
-    ...rest
-}) {
+function Dropdown ({ content, align = 'right', children, ...rest }) {
     const [visible, setVisible] = useState(false)
 
+    const handleToggle = () => setVisible(!visible)
+
+    const handleClose = () => setVisible(false)
+
     return (
-        <StyledDropdown onClick={() => setVisible(!visible)} {...rest}>
+        <StyledDropdown onClick={handleToggle} {...rest}>
             {content && (
-                <DropdownContainer align={align} visible={visible}>
+                <DropdownContainer align={align} visible={visible} onClick={handleClose}>
                     {content}
                 </DropdownContainer>
             )}
@@ -31,5 +29,3 @@ Dropdown.propTypes = {
 }
 
 export default Dropdown
-
-
