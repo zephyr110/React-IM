@@ -14,11 +14,12 @@ function FilterList ({
     options,
     filterLabel = '列表排序',
     actionLabel,
+    onSearch,
     ...rest
 }) {
     return (
         <StyledFilterList {...rest}>
-            <Input.Search />
+            <Input.Search onChange={(e) => onSearch && onSearch(e.target.value)} />
             <Filter style={{ padding: '20px 0' }}>
                 {options && (
                     <Filter.Filters label='列表排序'>
@@ -46,7 +47,8 @@ FilterList.propTypes = {
     children: PropTypes.any,
     options: PropTypes.array,
     filterLabel: PropTypes.string,
-    actionLabel: PropTypes.string
+    actionLabel: PropTypes.string,
+    onSearch: PropTypes.func,
 }
 
 export default FilterList
