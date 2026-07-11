@@ -76,9 +76,11 @@ export function MessageProvider ({ children }) {
           ...prev,
           [activeContactId]: [...(prev[activeContactId] || []), res.message],
         }))
+      } else {
+        showToast('消息发送失败，请重试', 'error')
       }
     })
-  }, [activeContactId, emit])
+  }, [activeContactId, emit, showToast])
 
   const sendVoiceMessage = useCallback((audioBlob, duration) => {
     if (!activeContactId || !audioBlob) return
@@ -96,11 +98,13 @@ export function MessageProvider ({ children }) {
             ...prev,
             [activeContactId]: [...(prev[activeContactId] || []), res.message],
           }))
+        } else {
+          showToast('语音消息发送失败，请重试', 'error')
         }
       })
     }
     reader.readAsDataURL(audioBlob)
-  }, [activeContactId, emit])
+  }, [activeContactId, emit, showToast])
 
   const loadHistory = useCallback((contactId) => {
     emit('message:history', { with: contactId }, (history) => {

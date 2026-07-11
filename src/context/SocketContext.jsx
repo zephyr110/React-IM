@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useEffect, useRef, useState, useCallback } from 'react'
 import { io } from 'socket.io-client'
+import { useToast } from 'hooks/useToast'
 
 const SOCKET_URL = import.meta.env.VITE_SOCKET_URL || 'http://localhost:4000'
 
@@ -9,6 +10,7 @@ export function SocketProvider ({ children }) {
   const socketRef = useRef(null)
   const [connected, setConnected] = useState(false)
   const [userId, setUserId] = useState(null)
+  const { showToast } = useToast()
 
   // 在 render 阶段同步创建 socket，确保子组件（MessageProvider）的 effect
   // 执行时 socketRef.current 已经指向可用的 socket 实例
@@ -26,14 +28,22 @@ export function SocketProvider ({ children }) {
     const socket = socketRef.current
     if (!socket) return
 
+    let wasConnected = socket.connected
+
     const handleConnect = () => {
       console.log('[socket] connected:', socket.id)
       setConnected(true)
+      if (wasConnected) {
+        showToast('已重新连接', 'success')
+      }
+      wasConnected = true
     }
 
     const handleDisconnect = (reason) => {
       console.log('[socket] disconnected:', reason)
       setConnected(false)
+      wasConnected = false
+      showToast('连接断开，正在重连...', 'warning')
     }
 
     if (socket.connected) {

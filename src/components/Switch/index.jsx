@@ -5,7 +5,7 @@ import StyledSwitch, { Checkbox, Slider } from './style'
 function Switch ({checked, onChange, children, ...rest}) {
     return (
         <StyledSwitch {...rest}>
-            <Checkbox checked={checked} onChange={onChange} />
+            <Checkbox checked={checked} onChange={(e) => onChange && onChange(e.target.checked)} />
             <Slider />
         </StyledSwitch>
     )
