@@ -62,5 +62,53 @@ const StyledChatBubble = styled.div`
     ${({ type }) => type && typeVariants[type]}
 `
 
+const QuoteCard = styled.div`
+    padding: 8px 12px;
+    margin-bottom: 8px;
+    background: rgba(0, 0, 0, 0.05);
+    border-left: 3px solid ${({ theme }) => theme.primaryColor};
+    border-radius: 4px;
+    max-width: 280px;
+`
+
+const ImageContent = styled.img`
+    max-width: 200px;
+    max-height: 200px;
+    border-radius: 12px;
+    cursor: pointer;
+    display: block;
+`
+
+const RevokedText = styled.span`
+    color: ${({ theme }) => theme.gray3};
+    font-size: ${({ theme }) => theme.small};
+    font-style: italic;
+`
+
+const ReadStatus = styled.span`
+    font-size: ${({ theme }) => theme.xxsmall};
+    color: ${({ theme }) => theme.gray3};
+    margin-left: 8px;
+    text-align: right;
+    margin-right: 24px;
+`
+
+const ContextMenu = styled.div`
+    background: #fff;
+    border-radius: 8px;
+    box-shadow: 0 4px 24px rgba(0,0,0,.15);
+    padding: 4px 0;
+    min-width: 100px;
+`
+
+const ContextMenuItem = styled.div`
+    padding: 8px 16px;
+    cursor: pointer;
+    font-size: 14px;
+    &:hover {
+        background: ${({ theme }) => theme.gray2};
+    }
+`
+
 export default StyledChatBubble
-export { Time, BubbleTip, Bubble, MessageText }
+export { Time, BubbleTip, Bubble, MessageText, QuoteCard, ImageContent, RevokedText, ReadStatus, ContextMenu, ContextMenuItem }
