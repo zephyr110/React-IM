@@ -1,17 +1,7 @@
 import styled from 'styled-components'
-import Icon from 'components/Icon'
 import Heading from 'components/Heading'
 import Paragraph from 'components/Paragraph'
-import Popover from 'components/Popover'
 import { card } from 'utils/mixins'
-
-const FileIcon = styled(Icon).attrs({
-    width: 60,
-    height: 60,
-})`
-    grid-area: icon;
-    justify-self: start;
-`
 
 const FileName = styled(Heading).attrs({ level: 2 })`
     grid-area: name;
@@ -20,12 +10,6 @@ const FileName = styled(Heading).attrs({ level: 2 })`
 
 const FileSize = styled(Paragraph).attrs({ type: 'secondary', size: 'small' })`
     grid-area: size;
-`
-
-const Options = styled(Popover)`
-    grid-area: option;
-    justify-self: end;
-    align-self: center;
 `
 
 const Time = styled(Paragraph).attrs({ type: 'secondary', size: 'small' })`
@@ -43,4 +27,4 @@ const StyledFileCard = styled.div`
 `
 
 export default StyledFileCard
-export { FileIcon, FileName, FileSize, Options, Time }
+export { FileName, FileSize, Time }

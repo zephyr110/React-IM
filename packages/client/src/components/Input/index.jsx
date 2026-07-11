@@ -1,9 +1,7 @@
 import React, { forwardRef } from 'react'
 import PropTypes from 'prop-types'
 import StyledInput, { InputContainer, Prefix, Suffix, StyledTextArea } from './style'
-import Icon from 'components/Icon'
-import SearchIcon from 'assets/icons/search.svg?react'
-import { useTheme } from 'styled-components'
+import { Search as SearchIcon } from 'lucide-react'
 import InputText from './InputText'
 
 const Input = forwardRef(function Input ({ placeholder = '请输入内容', prefix, suffix, multiline, ...rest }, ref) {
@@ -21,12 +19,11 @@ const Input = forwardRef(function Input ({ placeholder = '请输入内容', pref
 })
 
 function Search ({ placeholder = '请输入搜索内容', ...rest }) {
-    const theme = useTheme()
     return (
         <Input
             {...rest}
             placeholder={placeholder}
-            prefix={<Icon icon={SearchIcon} color={theme.gray3} width={18} height={18} />}
+            prefix={<SearchIcon className="w-[18px] h-[18px] text-muted-foreground" />}
         />
     )
 }

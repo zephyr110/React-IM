@@ -1,11 +1,9 @@
 import React from 'react'
 import PropTypes from 'prop-types'
-import StyledBlockedList, { SettingsMenu, ClosableAvatar, BlockedAvatar, BlockedName, CloseIcon, FriendList, BackIcon } from './style'
-import Icon from 'components/Icon'
+import StyledBlockedList, { SettingsMenu, ClosableAvatar, BlockedAvatar, BlockedName, FriendList } from './style'
 import Text from 'components/Text'
-import ArrowMenuLeft from 'assets/icons/arrowMenuLeft.svg?react'
+import { ArrowLeft, XCircle } from 'lucide-react'
 import avatarImg1 from 'assets/images/avatar-1.jpg'
-import closeCircle from 'assets/icons/closeCircle.svg?react'
 import { useNavigate } from 'react-router-dom'
 
 function BlockedList ({ children, ...rest }) {
@@ -14,12 +12,9 @@ function BlockedList ({ children, ...rest }) {
     return (
         <StyledBlockedList {...rest}>
             <SettingsMenu>
-                <BackIcon onClick={() => navigate(-1)}>
-                    <Icon
-                        icon={ArrowMenuLeft}
-                        style={{ opacity: '0.5' }}
-                    />
-                </BackIcon>
+                <button className="p-2 hover:bg-accent rounded-lg transition-colors" onClick={() => navigate(-1)}>
+                    <ArrowLeft className="w-5 h-5 opacity-50" />
+                </button>
                 <Text size='xlarge'>已屏蔽的好友</Text>
             </SettingsMenu>
             <FriendList>
@@ -27,7 +22,7 @@ function BlockedList ({ children, ...rest }) {
                     return (
                         <ClosableAvatar key={i}>
                             <BlockedAvatar size='105px' src={avatarImg1} />
-                            <CloseIcon width={46} height={51} icon={closeCircle} />
+                            <XCircle className="w-[46px] h-[51px] text-destructive cursor-pointer" style={{ gridArea: '2 / 3 / 5 / 4', zIndex: 10, marginTop: '10px' }} />
                             <BlockedName>楚中天</BlockedName>
                         </ClosableAvatar>
                     )

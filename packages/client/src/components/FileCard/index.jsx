@@ -1,36 +1,31 @@
 
 import React from 'react'
 import PropTypes from 'prop-types'
-import StyledFileCard, { FileIcon, FileName, FileSize, Options, Time} from './style'
-import FileZip from 'assets/icons/fileZip.svg?react'
-import FileExcel from 'assets/icons/fileExcel.svg?react'
-import FileWord from 'assets/icons/fileWord.svg?react'
-import FilePpt from 'assets/icons/filePpt.svg?react'
-import FileImage from 'assets/icons/fileImage.svg?react'
-import FilePdf from 'assets/icons/filePdf.svg?react'
-import OptionsIcons from 'assets/icons/options.svg?react'
-import Icon from 'components/Icon'
+import StyledFileCard, { FileName, FileSize, Time} from './style'
+import { FileArchive, FileSpreadsheet, FileText, FileImage, MoreHorizontal } from 'lucide-react'
 
 const fileIcons = {
-    zip: FileZip,
-    excel: FileExcel,
-    word: FileWord,
-    ppt: FilePpt,
+    zip: FileArchive,
+    excel: FileSpreadsheet,
+    word: FileText,
+    ppt: FileText,
     image: FileImage,
-    pdf: FilePdf
+    pdf: FileText
 }
 
 function FileCard ({ children, ...rest }) {
+    const IconComponent = fileIcons.zip
     return (
         <StyledFileCard {...rest}>
-            <FileIcon icon={fileIcons.zip} />
+            <div style={{ gridArea: 'icon', justifySelf: 'start' }}>
+                <IconComponent className="w-[60px] h-[60px] text-muted-foreground" />
+            </div>
             <FileName>Source Code.zip</FileName>
             <FileSize>1.5M</FileSize>
-            <Options>
-                <Icon icon={OptionsIcons} opacity={0.3}/>
-            </Options>
+            <div style={{ gridArea: 'option', justifySelf: 'end', alignSelf: 'center' }}>
+                <MoreHorizontal className="w-5 h-5 opacity-30" />
+            </div>
             <Time>2020.06.22</Time>
-            {/* {children} */}
         </StyledFileCard>
     )
 }

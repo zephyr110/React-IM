@@ -3,21 +3,19 @@ import PropTypes from 'prop-types'
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar'
 import { Separator } from '@/components/ui/separator'
 import { Button } from '@/components/ui/button'
-import { X, Pen } from 'lucide-react'
+import { X, Pen, MessageCircle, Code2, Briefcase } from 'lucide-react'
 import useProfile from 'hooks/useProfile'
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faWeibo, faGithub, faLinkedin } from '@fortawesome/free-brands-svg-icons'
 import paper1 from 'assets/images/paper-1.jpg'
 import paper2 from 'assets/images/paper-2.jpg'
 import paper3 from 'assets/images/paper-3.jpg'
 
-function SocialLink ({ icon, bgColor, href }) {
+function SocialLink ({ icon: IconComponent, bgColor, href }) {
     const circle = (
         <div
             className="w-10 h-10 rounded-full flex items-center justify-center text-white transition-transform hover:scale-110"
             style={{ backgroundColor: bgColor }}
         >
-            <FontAwesomeIcon icon={icon} className="text-lg" />
+            <IconComponent className="w-5 h-5" />
         </div>
     )
     if (href) {
@@ -97,9 +95,9 @@ function Profile ({
 
             {/* Social links */}
             <div className="flex gap-4 mb-8">
-                <SocialLink icon={faWeibo} bgColor="#f06767" href="http://www.weibo.com" />
-                <SocialLink icon={faGithub} bgColor="#000" />
-                <SocialLink icon={faLinkedin} bgColor="#2483c0" />
+                <SocialLink icon={MessageCircle} bgColor="#f06767" href="http://www.weibo.com" />
+                <SocialLink icon={Code2} bgColor="#000" />
+                <SocialLink icon={Briefcase} bgColor="#2483c0" />
             </div>
 
             <Separator className="mb-8" />

@@ -2,8 +2,7 @@ import React, { useState } from 'react'
 import PropTypes from 'prop-types'
 import StyledVideoCall, { Actions, Minimize, Action, Self, VideoCallAlert } from './style'
 import videoCaller from 'assets/images/paper-3.jpg'
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faMicrophone, faCompressAlt, faPhoneSlash, faVolumeMute, faVideo } from '@fortawesome/free-solid-svg-icons'
+import { Mic, Minimize2, PhoneOff, VolumeX, Video } from 'lucide-react'
 import Avatar from 'components/Avatar'
 import Paragraph from 'components/Paragraph'
 import avatarImg1 from 'assets/images/avatar-1.jpg'
@@ -35,8 +34,7 @@ function VideoCall ({ onHangOffClick, children, ...rest }) {
                     `}
                     onClick={() => setFullScreen(true)}
                 >点击切换全屏</Paragraph>
-                <FontAwesomeIcon
-                    icon={faVideo}
+                <Video className="w-5 h-5"
                     css={`
                         grid-area: icon;
                         font-size: 20px;
@@ -51,17 +49,17 @@ function VideoCall ({ onHangOffClick, children, ...rest }) {
     return (
         <StyledVideoCall src={videoCaller} {...rest}>
             <Minimize shape='rect' onClick={() => setFullScreen(false)}>
-                <FontAwesomeIcon icon={faCompressAlt} />
+                <Minimize2 className="w-5 h-5" />
             </Minimize>
             <Actions>
                 <Action>
-                    <FontAwesomeIcon icon={faMicrophone} />
+                    <Mic className="w-5 h-5" />
                 </Action>
                 <Action type='hangoff'>
-                    <FontAwesomeIcon icon={faPhoneSlash} onClick={onHangOffClick} />
+                    <PhoneOff className="w-5 h-5" onClick={onHangOffClick} />
                 </Action>
                 <Action>
-                    <FontAwesomeIcon icon={faVolumeMute} />
+                    <VolumeX className="w-5 h-5" />
                 </Action>
             </Actions>
             <Self size='140px' src={avatarImg1} />

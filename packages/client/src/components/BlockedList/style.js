@@ -1,6 +1,5 @@
 import styled from 'styled-components'
 import Avatar from 'components/Avatar'
-import Icon from 'components/Icon'
 import StyledText from 'components/Text/style'
 import Text from 'components/Text'
 
@@ -8,21 +7,9 @@ const BlockedAvatar = styled(Avatar)`
     grid-area: avatar;
 `
 
-const BackIcon = styled.label`
-    width: 60px;
-    height: 30px;
-    cursor: pointer;
-`
-
 const BlockedName = styled(Text).attrs({ size: 'xlarge' })`
     grid-area: name;
     margin-top: 20px;
-`
-
-const CloseIcon = styled(Icon)`
-    grid-area: 2 / 3 / 5 / 4;
-    z-index: 10;
-    margin-top: 10px;
 `
 
 const ClosableAvatar = styled.div`
@@ -41,7 +28,7 @@ const SettingsMenu = styled.div`
     display: grid;
     grid-template-columns: 10px 1fr;
     align-items: center;
- 
+
     ${StyledText}{
         grid-column: span 1/-1;
         justify-self: center;
@@ -60,4 +47,4 @@ const StyledBlockedList = styled.div`
 `
 
 export default StyledBlockedList
-export { SettingsMenu, BlockedAvatar, BlockedName, CloseIcon, ClosableAvatar, FriendList, BackIcon }
+export { SettingsMenu, BlockedAvatar, BlockedName, ClosableAvatar, FriendList }

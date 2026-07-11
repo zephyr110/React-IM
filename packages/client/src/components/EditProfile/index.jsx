@@ -6,15 +6,12 @@ import Avatar from 'components/Avatar'
 import useProfile from 'hooks/useProfile'
 // import avatarImg1 from 'assets/images/avatar-1.jpg'
 import Button from 'components/Button'
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faCheck } from '@fortawesome/free-solid-svg-icons'
-import { faWeibo, faGithub, faLinkedin } from '@fortawesome/free-brands-svg-icons'
+import { Check, Globe } from 'lucide-react'
 import InputText from 'components/Input/InputText'
 import Radio from 'components/Radio'
 import LabelContainer from 'components/LabelContainer'
 import Select from 'components/Select'
 import Option from 'components/Option'
-import Icon from 'components/Icon'
 
 
 function EditProfile ({ children, src, ...rest }) {
@@ -63,7 +60,7 @@ function EditProfile ({ children, src, ...rest }) {
                     z-index: 10;
                 `}
             >
-                <FontAwesomeIcon icon={faCheck} style={{transform: 'scale(2)'}} onClick={handleSave} />
+                <Check className="w-5 h-5" onClick={handleSave} />
             </Button>
 
             <GroupTitle>基本信息</GroupTitle>
@@ -95,18 +92,23 @@ function EditProfile ({ children, src, ...rest }) {
             <InputText label='个人网站' value={form.website} onChange={e => setForm({...form, website: e.target.value})} />
 
             <GroupTitle>社交信息</GroupTitle>
-            <IconInput icon={faWeibo} bgColor='#f06767' value={form.weibo} onChange={e => setForm({...form, weibo: e.target.value})} />
-            <IconInput icon={faGithub} bgColor='#000' value={form.github} onChange={e => setForm({...form, github: e.target.value})} />
-            <IconInput icon={faLinkedin} bgColor='#2483c0' value={form.linkedin} onChange={e => setForm({...form, linkedin: e.target.value})} />
+            <IconInput label='微博' bgColor='#f06767' value={form.weibo} onChange={e => setForm({...form, weibo: e.target.value})} />
+            <IconInput label='GitHub' bgColor='#000' value={form.github} onChange={e => setForm({...form, github: e.target.value})} />
+            <IconInput label='领英' bgColor='#2483c0' value={form.linkedin} onChange={e => setForm({...form, linkedin: e.target.value})} />
         </StyledEditProfile>
     )
 }
 
-function IconInput ({ icon, bgColor, ...rest }) {
+function IconInput ({ label, bgColor, ...rest }) {
     return (
         <StyledIconInput>
-            <Icon.Social icon={icon} bgColor={bgColor} />
-            <InputText  {...rest} />
+            <div
+                className="w-[38px] h-[38px] rounded-full flex items-center justify-center text-white"
+                style={{ backgroundColor: bgColor }}
+            >
+                <Globe className="w-4 h-4" />
+            </div>
+            <InputText label={label} {...rest} />
         </StyledIconInput>
     )
 }
