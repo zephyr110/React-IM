@@ -116,7 +116,7 @@ function Login ({ onLogin, onSwitchToRegister }) {
                 还没有账号？{' '}
                 <button type='button' onClick={onSwitchToRegister} className='text-primary hover:underline font-medium'>
                   立即注册
-                </a>
+                </button>
               </div>
             </CardContent>
           </Card>
