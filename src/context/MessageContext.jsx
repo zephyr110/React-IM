@@ -42,6 +42,38 @@ export function MessageProvider ({ children }) {
     return cleanup
   }, [on, activeContactId, isBlocked])
 
+  // 监听消息撤回
+  useEffect(() => {
+    const cleanup = on('message:revoked', ({ messageId }) => {
+      setMessages(prev => {
+        const next = { ...prev }
+        Object.keys(next).forEach(contactId => {
+          next[contactId] = next[contactId].map(m =>
+            m.id === messageId ? { ...m, revoked: true } : m
+          )
+        })
+        return next
+      })
+    })
+    return cleanup
+  }, [on])
+
+  // 监听已读回执
+  useEffect(() => {
+    const cleanup = on('message:read', ({ messageId }) => {
+      setMessages(prev => {
+        const next = { ...prev }
+        Object.keys(next).forEach(contactId => {
+          next[contactId] = next[contactId].map(m =>
+            m.id === messageId ? { ...m, read: true } : m
+          )
+        })
+        return next
+      })
+    })
+    return cleanup
+  }, [on])
+
   // 监听用户上线/下线
   useEffect(() => {
     const onlineCleanup = on('user:online', ({ userId: uid, name }) => {
@@ -64,13 +96,15 @@ export function MessageProvider ({ children }) {
     return () => { onlineCleanup(); offlineCleanup() }
   }, [on, showToast])
 
-  const sendTextMessage = useCallback((content) => {
+  const sendTextMessage = useCallback((content, quote) => {
     if (!activeContactId || !content.trim()) return
-    emit('message:send', {
+    const payload = {
       to: activeContactId,
       content: content.trim(),
       type: 'text',
-    }, (res) => {
+    }
+    if (quote) payload.quote = quote
+    emit('message:send', payload, (res) => {
       if (res?.success) {
         setMessages(prev => ({
           ...prev,
@@ -106,6 +140,45 @@ export function MessageProvider ({ children }) {
     reader.readAsDataURL(audioBlob)
   }, [activeContactId, emit, showToast])
 
+  const sendImageMessage = useCallback((imageFile) => {
+    if (!activeContactId || !imageFile) return
+    // Compress/resize image to max 800px wide before sending
+    const reader = new FileReader()
+    reader.onloadend = () => {
+      const img = new Image()
+      img.onload = () => {
+        const canvas = document.createElement('canvas')
+        const maxWidth = 800
+        let { width, height } = img
+        if (width > maxWidth) {
+          height = (maxWidth / width) * height
+          width = maxWidth
+        }
+        canvas.width = width
+        canvas.height = height
+        const ctx = canvas.getContext('2d')
+        ctx.drawImage(img, 0, 0, width, height)
+        const base64 = canvas.toDataURL('image/jpeg', 0.7)
+        emit('message:send', {
+          to: activeContactId,
+          content: base64,
+          type: 'image',
+        }, (res) => {
+          if (res?.success) {
+            setMessages(prev => ({
+              ...prev,
+              [activeContactId]: [...(prev[activeContactId] || []), res.message],
+            }))
+          } else {
+            showToast('图片发送失败，请重试', 'error')
+          }
+        })
+      }
+      img.src = reader.result
+    }
+    reader.readAsDataURL(imageFile)
+  }, [activeContactId, emit, showToast])
+
   const loadHistory = useCallback((contactId) => {
     emit('message:history', { with: contactId }, (history) => {
       setMessages(prev => ({
@@ -124,11 +197,36 @@ export function MessageProvider ({ children }) {
       delete next[contactId]
       return next
     })
-  }, [loadHistory])
+    // Send read receipt for last message in this conversation
+    setMessages(prev => {
+      const msgs = prev[contactId] || []
+      const lastMsg = msgs[msgs.length - 1]
+      if (lastMsg && lastMsg.from !== userId && !lastMsg.read) {
+        emit('message:read', { from: lastMsg.from, messageId: lastMsg.id })
+      }
+      return prev
+    })
+  }, [loadHistory, userId, emit])
 
   const closeConversation = useCallback(() => {
     setActiveContactId(null)
   }, [])
+
+  const revokeMessage = useCallback((messageId) => {
+    if (!activeContactId) return
+    emit('message:revoke', { messageId, to: activeContactId }, (res) => {
+      if (res?.success) {
+        setMessages(prev => ({
+          ...prev,
+          [activeContactId]: (prev[activeContactId] || []).map(m =>
+            m.id === messageId ? { ...m, revoked: true } : m
+          ),
+        }))
+      } else {
+        showToast(res?.error || '撤回失败', 'error')
+      }
+    })
+  }, [activeContactId, emit, showToast])
 
   return (
     <MessageContext.Provider value={{
@@ -140,6 +238,8 @@ export function MessageProvider ({ children }) {
       userId,
       sendTextMessage,
       sendVoiceMessage,
+      sendImageMessage,
+      revokeMessage,
       openConversation,
       closeConversation,
       loadHistory,
