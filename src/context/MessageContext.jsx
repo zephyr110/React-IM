@@ -1,10 +1,14 @@
 import React, { createContext, useContext, useState, useCallback, useEffect } from 'react'
 import { useSocket } from './SocketContext'
+import useBlockedList from 'hooks/useBlockedList'
+import { useToast } from 'hooks/useToast'
 
 const MessageContext = createContext(null)
 
 export function MessageProvider ({ children }) {
   const { socket, connected, emit, on, userId } = useSocket()
+  const { isBlocked } = useBlockedList()
+  const { showToast } = useToast()
   const [contacts, setContacts] = useState([])
   const [messages, setMessages] = useState({})
   const [activeContactId, setActiveContactId] = useState(null)
@@ -21,6 +25,9 @@ export function MessageProvider ({ children }) {
   // 监听新消息
   useEffect(() => {
     const cleanup = on('message:new', (msg) => {
+      // Filter out messages from blocked users
+      if (isBlocked(msg.from)) return
+
       const otherId = msg.from
       setMessages(prev => ({
         ...prev,
@@ -33,18 +40,29 @@ export function MessageProvider ({ children }) {
       })
     })
     return cleanup
-  }, [on, activeContactId])
+  }, [on, activeContactId, isBlocked])
 
   // 监听用户上线/下线
   useEffect(() => {
-    const onlineCleanup = on('user:online', ({ userId: uid }) => {
+    const onlineCleanup = on('user:online', ({ userId: uid, name }) => {
       setContacts(prev => prev.map(c => c.id === uid ? { ...c, online: true } : c))
+      // Find contact name if not provided in event
+      setContacts(prev => {
+        const contact = prev.find(c => c.id === uid)
+        const displayName = name || contact?.name || uid
+        showToast(`${displayName} 上线了`, 'info')
+        return prev
+      })
     })
     const offlineCleanup = on('user:offline', ({ userId: uid }) => {
-      setContacts(prev => prev.map(c => c.id === uid ? { ...c, online: false } : c))
+      setContacts(prev => {
+        const contact = prev.find(c => c.id === uid)
+        showToast(`${contact?.name || uid} 离线了`, 'info')
+        return prev.map(c => c.id === uid ? { ...c, online: false } : c)
+      })
     })
     return () => { onlineCleanup(); offlineCleanup() }
-  }, [on])
+  }, [on, showToast])
 
   const sendTextMessage = useCallback((content) => {
     if (!activeContactId || !content.trim()) return
