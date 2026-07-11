@@ -24,6 +24,7 @@ function Search ({ placeholder = '请输入搜索内容', ...rest }) {
     const theme = useTheme()
     return (
         <Input
+            {...rest}
             placeholder={placeholder}
             prefix={<Icon icon={SearchIcon} color={theme.gray3} width={18} height={18} />}
         />

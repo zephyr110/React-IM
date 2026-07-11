@@ -6,10 +6,10 @@ import LabelContainer from 'components/LabelContainer'
 
 
 function InputText ({ label, placeholder = '请输入内容', children, ...rest }) {
-    const input = <InputUnderline type='text' placeholder={placeholder} />
+    const input = <InputUnderline type='text' placeholder={placeholder} {...rest} />
 
     return (
-        <StyledInputText {...rest}>
+        <StyledInputText>
             {label ? <LabelContainer label={label}>{input}</LabelContainer> : input}
         </StyledInputText>
     )

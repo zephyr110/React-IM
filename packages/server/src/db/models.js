@@ -32,7 +32,7 @@ function getContact (id) {
 
 function addMessage ({ from, to, content, type = 'text', duration, quoteId }) {
   const db = getDb()
-  const id = Date.now().toString()
+  const id = require('crypto').randomUUID()
   const roomKey = [from, to].sort().join('-')
   const time = new Date().toISOString()
 
@@ -73,7 +73,7 @@ function revokeMessage (messageId, userId) {
   if (!msg) return { success: false, error: '消息不存在' }
   if (msg.sender_id !== userId) return { success: false, error: '无权撤回' }
 
-  const elapsed = Date.now() - new Date(msg.created_at + 'Z').getTime()
+  const elapsed = Date.now() - new Date(msg.created_at).getTime()
   if (elapsed > 2 * 60 * 1000) return { success: false, error: '超过2分钟无法撤回' }
 
   db.prepare('UPDATE messages SET revoked = 1, content = ? WHERE id = ?')

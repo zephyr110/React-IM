@@ -1,32 +1,53 @@
 const { createUser, getContacts, getContact, addMessage, getHistory, revokeMessage } = require('./db/models')
 
 function setupSocket (io) {
+  // userId → Set of socketIds (support multiple tabs/devices)
   const onlineUsers = new Map()
+
+  function emitToUser (userId, event, data) {
+    const sockets = onlineUsers.get(userId)
+    if (sockets) {
+      for (const sid of sockets) {
+        io.to(sid).emit(event, data)
+      }
+    }
+  }
+
+  function isOnline (userId) {
+    const sockets = onlineUsers.get(userId)
+    return sockets != null && sockets.size > 0
+  }
 
   io.on('connection', (socket) => {
     console.log(`[socket] connected: ${socket.id}`)
 
     socket.on('login', ({ userId, name, avatar }) => {
-      // 创建或更新用户
+      if (!userId) return
       createUser({ id: userId, name, avatar })
 
-      onlineUsers.set(userId, socket.id)
+      if (!onlineUsers.has(userId)) {
+        onlineUsers.set(userId, new Set())
+      }
+      const wasOffline = onlineUsers.get(userId).size === 0
+      onlineUsers.get(userId).add(socket.id)
+
       socket.userId = userId
       socket.userName = name
       console.log(`[socket] login: ${name} (${userId})`)
 
-      socket.broadcast.emit('user:online', { userId, name, avatar })
+      if (wasOffline) {
+        socket.broadcast.emit('user:online', { userId, name, avatar })
+      }
 
-      // 返回联系人列表（附带在线状态）
       const contacts = getContacts().map(c => ({
         ...c,
-        online: onlineUsers.has(c.id),
+        online: isOnline(c.id),
       }))
       socket.emit('contacts', contacts)
     })
 
     socket.on('message:send', ({ to, content, type, duration, quote }, callback) => {
-      if (!socket.userId) return
+      if (!socket.userId || !to) return
 
       try {
         const msg = addMessage({
@@ -38,10 +59,7 @@ function setupSocket (io) {
           quoteId: quote?.id || null,
         })
 
-        const targetSocketId = onlineUsers.get(to)
-        if (targetSocketId) {
-          io.to(targetSocketId).emit('message:new', msg)
-        }
+        emitToUser(to, 'message:new', msg)
         if (callback) callback({ success: true, message: msg })
       } catch (err) {
         console.error('[socket] message:send error:', err)
@@ -60,32 +78,26 @@ function setupSocket (io) {
 
       const result = revokeMessage(messageId, socket.userId)
       if (result.success) {
-        const targetSocketId = onlineUsers.get(to)
-        if (targetSocketId) {
-          io.to(targetSocketId).emit('message:revoked', { messageId })
-        }
+        emitToUser(to, 'message:revoked', { messageId })
       }
       if (callback) callback(result)
     })
 
     socket.on('message:read', ({ from, messageId }) => {
-      const targetSocketId = onlineUsers.get(from)
-      if (targetSocketId) {
-        io.to(targetSocketId).emit('message:read', { messageId, readBy: socket.userId })
-      }
+      emitToUser(from, 'message:read', { messageId, readBy: socket.userId })
     })
 
     socket.on('typing', ({ to }) => {
-      const targetSocketId = onlineUsers.get(to)
-      if (targetSocketId) {
-        io.to(targetSocketId).emit('typing', { from: socket.userId, name: socket.userName })
-      }
+      emitToUser(to, 'typing', { from: socket.userId, name: socket.userName })
     })
 
     socket.on('disconnect', () => {
-      if (socket.userId) {
-        onlineUsers.delete(socket.userId)
-        socket.broadcast.emit('user:offline', { userId: socket.userId })
+      if (socket.userId && onlineUsers.has(socket.userId)) {
+        onlineUsers.get(socket.userId).delete(socket.id)
+        if (onlineUsers.get(socket.userId).size === 0) {
+          onlineUsers.delete(socket.userId)
+          socket.broadcast.emit('user:offline', { userId: socket.userId })
+        }
         console.log(`[socket] offline: ${socket.userName} (${socket.userId})`)
       }
     })

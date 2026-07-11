@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react'
+import React, { useState, useRef, useMemo } from 'react'
 import PropTypes from 'prop-types'
 import StyledFooter, {
   IconContainer,
@@ -113,7 +113,12 @@ function Footer ({
         e.target.value = ''
     }
 
+    const imagePreviewUrl = useMemo(() => {
+        return imagePreview ? URL.createObjectURL(imagePreview) : null
+    }, [imagePreview])
+
     const handleCancelImage = () => {
+        if (imagePreviewUrl) URL.revokeObjectURL(imagePreviewUrl)
         setImagePreview(null)
     }
 
@@ -234,7 +239,7 @@ function Footer ({
             {imagePreview && (
                 <div style={{ display: 'flex', alignItems: 'center', padding: '4px 12px', marginBottom: 8 }}>
                     <img
-                        src={URL.createObjectURL(imagePreview)}
+                        src={imagePreviewUrl}
                         alt="preview"
                         style={{ maxHeight: 80, borderRadius: 8 }}
                     />

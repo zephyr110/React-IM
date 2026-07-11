@@ -58,10 +58,20 @@ export default function useVoiceRecorder ({ maxDuration = 60 } = {}) {
         cleanupStream()
       }
 
+      recorder.onerror = (e) => {
+        console.error('[VoiceRecorder] recorder error:', e.error)
+        setRecordingState('idle')
+        clearTimer()
+        cleanupStream()
+      }
+
       setRecordingState('recording')
       setDuration(0)
       setAudioBlob(null)
-      setAudioUrl(null)
+      setAudioUrl(prev => {
+        if (prev) URL.revokeObjectURL(prev)
+        return null
+      })
 
       recorder.start(100) // 每 100ms 收集一次数据
 
