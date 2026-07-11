@@ -1,72 +1,102 @@
-[预览](https://tienouc.gitee.io/react-im/#/)
+# React-IM
 
-![](https://tva1.sinaimg.cn/large/007S8ZIlly1gh1dpfb2yij31b30u0gsg.jpg)
+即时通讯 Web 应用，基于 React 18 + Vite + Socket.IO + SQLite + Tailwind CSS + shadcn/ui。
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+## 技术栈
 
-## Available Scripts
+| 层 | 技术 |
+|-----|------|
+| 前端 | React 18, Vite 5, Tailwind CSS, shadcn/ui, lucide-react |
+| 状态管理 | React Context + Hooks |
+| 实时通信 | Socket.IO 4 |
+| 后端 | Express 5, Socket.IO |
+| 数据库 | SQLite (better-sqlite3) |
+| 动画 | react-spring 9 |
+| 测试 | Vitest, Testing Library |
+| 包管理 | pnpm (monorepo) |
 
-In the project directory, you can run:
+## 项目结构
 
-### `yarn start`
+```
+React-IM/
+├── packages/
+│   ├── client/          # 前端 React 应用
+│   │   └── src/
+│   │       ├── components/   # UI 组件
+│   │       │   └── ui/       # shadcn/ui 基础组件
+│   │       ├── context/      # React Context (Socket, Message)
+│   │       ├── hooks/        # 自定义 Hooks
+│   │       ├── lib/          # 工具函数
+│   │       └── data/         # 静态数据 (emoji)
+│   └── server/          # 后端 Express + Socket.IO
+│       └── src/
+│           ├── db/           # 数据库层 (models, schema)
+│           ├── index.js      # 入口 + REST API
+│           └── socket.js     # Socket.IO 事件处理
+├── docs/                 # 文档
+└── pnpm-workspace.yaml   # Monorepo 配置
+```
 
-Runs the app in the development mode.<br />
-Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
+## 快速启动
 
-The page will reload if you make edits.<br />
-You will also see any lint errors in the console.
+```bash
+# 安装依赖
+pnpm install
 
-### `yarn test`
+# 同时启动前后端
+pnpm dev
 
-Launches the test runner in the interactive watch mode.<br />
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+# 或分别启动
+pnpm server    # 后端 http://localhost:4000
+pnpm start     # 前端 http://localhost:3000
+```
 
-### `yarn build`
+## 命令
 
-Builds the app for production to the `build` folder.<br />
-It correctly bundles React in production mode and optimizes the build for the best performance.
+```bash
+pnpm dev          # 同时启动前后端
+pnpm build        # 构建前端
+pnpm server       # 启动后端
+pnpm start        # 启动前端开发服务器
+pnpm test         # 运行测试
+pnpm storybook    # 启动 Storybook
+```
 
-The build is minified and the filenames include the hashes.<br />
-Your app is ready to be deployed!
+## 功能
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+- 文字消息收发
+- 语音消息录制/播放
+- 表情选择器（9 分类）
+- 图片发送（压缩后 base64）
+- 消息引用回复
+- @提及高亮
+- 消息撤回（2 分钟内）
+- 已读回执
+- 草稿保存
+- 未读计数
+- 消息搜索
+- 联系人管理
+- 在线状态实时推送
+- 屏蔽用户
+- Toast 通知系统
+- 个人资料编辑
+- 快捷键（Esc 关闭会话，Ctrl+Enter 发送）
+- 视频通话 UI（占位）
 
-### `yarn eject`
+## API
 
-**Note: this is a one-way operation. Once you `eject`, you can’t go back!**
+```
+GET  /api/health                    # 健康检查
+GET  /api/contacts                  # 联系人列表
+GET  /api/users/:id                 # 用户信息
+GET  /api/messages/:user1/:user2    # 消息历史
+```
 
-If you aren’t satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+## 数据库
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you’re on your own.
+SQLite 文件位于 `packages/server/src/data/im.db`，首次启动自动创建表和种子数据。
 
-You don’t have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn’t feel obligated to use this feature. However we understand that this tool wouldn’t be useful if you couldn’t customize it when you are ready for it.
-
-## Learn More
-
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
-
-To learn React, check out the [React documentation](https://reactjs.org/).
-
-### Code Splitting
-
-This section has moved here: https://facebook.github.io/create-react-app/docs/code-splitting
-
-### Analyzing the Bundle Size
-
-This section has moved here: https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size
-
-### Making a Progressive Web App
-
-This section has moved here: https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app
-
-### Advanced Configuration
-
-This section has moved here: https://facebook.github.io/create-react-app/docs/advanced-configuration
-
-### Deployment
-
-This section has moved here: https://facebook.github.io/create-react-app/docs/deployment
-
-### `yarn build` fails to minify
-
-This section has moved here: https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify
+表结构：
+- `users` — 用户
+- `contacts` — 联系人（预置 4 个）
+- `messages` — 消息（按 room_key 分区，最多 200 条/房间）
