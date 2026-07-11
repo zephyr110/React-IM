@@ -38,12 +38,17 @@ function Footer ({
     const [emojiIconActive, setEmojiIconActive] = useState(false)
     const { saveDraft, getDraft, clearDraft } = useDrafts()
     const theme = useTheme()
-    const { sendTextMessage, sendVoiceMessage, activeContactId } = useMessages()
+    const { sendTextMessage, sendVoiceMessage, sendImageMessage, activeContactId } = useMessages()
     const inputRef = useRef(null)
     const prevContactRef = useRef(activeContactId)
 
     // State - restore draft for current contact
     const [inputValue, setInputValue] = useState(() => getDraft(activeContactId))
+    // 引用回复状态
+    const [quoteMessage, setQuoteMessage] = useState(null)
+    // 图片发送状态
+    const [imagePreview, setImagePreview] = useState(null)
+    const fileInputRef = useRef(null)
 
     // Save draft when switching contacts
     if (prevContactRef.current !== activeContactId) {
@@ -63,9 +68,17 @@ function Footer ({
 
     // 简单写法：不用 useCallback，避免闭包问题
     const handleSend = () => {
-        if (!inputValue.trim()) return
-        sendTextMessage(inputValue)
+        if (!inputValue.trim() && !imagePreview) return
+        if (imagePreview) {
+            sendImageMessage(imagePreview)
+            setImagePreview(null)
+            setInputValue('')
+            clearDraft(activeContactId)
+            return
+        }
+        sendTextMessage(inputValue, quoteMessage)
         setInputValue('')
+        setQuoteMessage(null)
         clearDraft(activeContactId)
     }
 
@@ -74,11 +87,38 @@ function Footer ({
             e.preventDefault()
             handleSend()
         }
+        if (e.key === 'Enter' && e.ctrlKey) {
+            e.preventDefault()
+            handleSend()
+        }
     }
 
     const handleChange = (e) => {
         setInputValue(e.target.value)
         saveDraft(activeContactId, e.target.value)
+    }
+
+    const handleClipClick = () => {
+        fileInputRef.current?.click()
+    }
+
+    const handleImageSelect = (e) => {
+        const file = e.target.files?.[0]
+        if (!file || !file.type.startsWith('image/')) return
+        if (file.size > 5 * 1024 * 1024) {
+            alert('图片大小不能超过5MB')
+            return
+        }
+        setImagePreview(file)
+        e.target.value = ''
+    }
+
+    const handleCancelImage = () => {
+        setImagePreview(null)
+    }
+
+    const handleCancelQuote = () => {
+        setQuoteMessage(null)
     }
 
     // 将表情符号插入到输入框光标位置
@@ -121,6 +161,11 @@ function Footer ({
         const mins = Math.floor(seconds / 60)
         const secs = seconds % 60
         return mins > 0 ? `${mins}:${secs.toString().padStart(2, '0')}` : `${secs}"`
+    }
+
+    // Expose setQuoteMessage for external use via a global ref
+    if (typeof window !== 'undefined') {
+        window.__setQuoteMessage = setQuoteMessage
     }
 
     const renderSuffix = () => {
@@ -171,6 +216,41 @@ function Footer ({
 
     return (
         <StyledFooter style={{ ...style, ...footerAnimation }} {...rest}>
+            {/* 引用消息栏 */}
+            {quoteMessage && (
+                <div style={{
+                    display: 'flex', alignItems: 'center', padding: '8px 12px',
+                    background: theme.gray2, borderRadius: 8, marginBottom: 8,
+                    fontSize: 13, color: theme.gray3
+                }}>
+                    <span style={{ flex: 1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                        回复: {quoteMessage.content?.substring(0, 50)}
+                    </span>
+                    <Icon icon={CrossIcon} style={{ cursor: 'pointer', marginLeft: 8 }} onClick={handleCancelQuote} />
+                </div>
+            )}
+
+            {/* 图片预览 */}
+            {imagePreview && (
+                <div style={{ display: 'flex', alignItems: 'center', padding: '4px 12px', marginBottom: 8 }}>
+                    <img
+                        src={URL.createObjectURL(imagePreview)}
+                        alt="preview"
+                        style={{ maxHeight: 80, borderRadius: 8 }}
+                    />
+                    <Icon icon={CrossIcon} style={{ cursor: 'pointer', marginLeft: 8 }} onClick={handleCancelImage} />
+                </div>
+            )}
+
+            {/* 隐藏的文件选择器 */}
+            <input
+                type="file"
+                ref={fileInputRef}
+                style={{ display: 'none' }}
+                accept="image/*"
+                onChange={handleImageSelect}
+            />
+
             <Input
                 multiline
                 placeholder='请输入想和对方说的话，Shift+Enter 换行'
@@ -178,7 +258,7 @@ function Footer ({
                 onChange={handleChange}
                 onKeyDown={handleKeyDown}
                 disabled={!activeContactId || recordingState !== 'idle'}
-                prefix={recordingState === 'idle' ? <Icon icon={ClipIcon} /> : null}
+                prefix={recordingState === 'idle' ? <Icon icon={ClipIcon} style={{ cursor: 'pointer' }} onClick={handleClipClick} /> : null}
                 suffix={renderSuffix()}
                 ref={inputRef}
             />

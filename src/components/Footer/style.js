@@ -124,5 +124,35 @@ const RecordingCancelHint = styled.span`
     margin-left: 4px;
 `
 
+const QuoteBar = styled.div`
+    display: flex;
+    align-items: center;
+    padding: 8px 12px;
+    background: ${({ theme }) => theme.gray2};
+    border-radius: 8px;
+    margin-bottom: 8px;
+    font-size: 13px;
+    color: ${({ theme }) => theme.gray3};
+`
+
+const QuoteContent = styled.span`
+    flex: 1;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+`
+
+const ImagePreviewContainer = styled.div`
+    display: flex;
+    align-items: center;
+    padding: 4px 12px;
+    margin-bottom: 8px;
+`
+
+const ImagePreviewImg = styled.img`
+    max-height: 80px;
+    border-radius: 8px;
+`
+
 export default StyledFooter
-export { IconContainer, StyledPopoverContent, EmojiGrid, EmojiItem, CategoryTabs, CategoryTab, RecordingIndicator, RecordingDot, RecordingTime, RecordingCancelHint }
+export { IconContainer, StyledPopoverContent, EmojiGrid, EmojiItem, CategoryTabs, CategoryTab, RecordingIndicator, RecordingDot, RecordingTime, RecordingCancelHint, QuoteBar, QuoteContent, ImagePreviewContainer, ImagePreviewImg }
