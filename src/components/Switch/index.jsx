@@ -1,21 +1,20 @@
-
 import React from 'react'
 import PropTypes from 'prop-types'
 import StyledSwitch, { Checkbox, Slider } from './style'
 
-function Switch ({children, ...rest}) {
+function Switch ({checked, onChange, children, ...rest}) {
     return (
         <StyledSwitch {...rest}>
-            <Checkbox />
+            <Checkbox checked={checked} onChange={onChange} />
             <Slider />
         </StyledSwitch>
     )
 }
 
 Switch.propTypes = {
-    children: PropTypes.any
+    children: PropTypes.any,
+    checked: PropTypes.bool,
+    onChange: PropTypes.func
 }
 
 export default Switch
-
-
