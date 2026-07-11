@@ -1,6 +1,5 @@
 import React, { useState, useMemo } from 'react'
 import PropTypes from 'prop-types'
-import StyledMessageList, { ChatList } from './style'
 import MessageCard from 'components/MessageCard'
 import avatarImg1 from 'assets/images/avatar-1.jpg'
 import avatarImg2 from 'assets/images/avatar-2.jpg'
@@ -32,13 +31,13 @@ function MessageList ({ children, ...rest }) {
     const trailAnimation = useStaggeredList(filteredContacts.length || 1)
 
     return (
-        <StyledMessageList {...rest}>
+        <div className="h-full flex flex-col" {...rest}>
             <FilterList
                 options={['最新消息优先', '在线好友优先']}
                 actionLabel='创建会话'
                 onSearch={setSearchText}
             >
-                <ChatList>
+                <div className="space-y-0.5 px-2 pb-2">
                     {filteredContacts.map((contact, index) => {
                         const contactMsgs = messages[contact.id] || []
                         const lastMsg = contactMsgs[contactMsgs.length - 1]
@@ -47,11 +46,9 @@ function MessageList ({ children, ...rest }) {
                                 <MessageCard
                                     key={contact.id}
                                     active={contact.id === activeContactId}
-                                    replied={false}
                                     avatarSrc={getAvatarSrc(contact.avatar)}
                                     name={contact.name}
                                     avatarStatus={contact.online ? 'online' : 'offline'}
-                                    statusText={contact.online ? '在线' : '离线'}
                                     time={lastMsg?.time || ''}
                                     message={lastMsg?.content || contact.lastMessage || ''}
                                     unreadCount={unreadCounts?.[contact.id] || 0}
@@ -60,9 +57,9 @@ function MessageList ({ children, ...rest }) {
                             </animated.div>
                         )
                     })}
-                </ChatList>
+                </div>
             </FilterList>
-        </StyledMessageList>
+        </div>
     )
 }
 

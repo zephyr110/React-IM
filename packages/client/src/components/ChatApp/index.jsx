@@ -1,5 +1,4 @@
 import React, { useState } from 'react'
-import StyledChatApp, { Nav, Sidebar, Content, Drawer } from './style'
 import NavBar from 'components/NavBar'
 import MessageList from 'components/MessageList'
 import Conversation from 'components/Conversation'
@@ -38,13 +37,16 @@ function ChatApp ({ children, ...rest }) {
     }
 
     return (
-        <StyledChatApp {...rest}>
-            <Nav>
+        <div className="flex h-screen overflow-hidden bg-background" {...rest}>
+            {/* Nav sidebar - fixed 56px */}
+            <div className="w-14 shrink-0 z-100">
                 <NavBar />
-            </Nav>
-            <Sidebar>
+            </div>
+
+            {/* Sidebar panel - 320px */}
+            <div className="w-80 shrink-0 border-r relative z-50 bg-muted/30">
                 {transitions((style, item) => (
-                    <animated.div style={style}>
+                    <animated.div style={style} className="absolute w-full will-change-transform">
                         <Routes location={item}>
                             <Route path="/" element={<MessageList />} />
                             <Route path="/contacts" element={<ConcatList />} />
@@ -54,8 +56,10 @@ function ChatApp ({ children, ...rest }) {
                         </Routes>
                     </animated.div>
                 ))}
-            </Sidebar>
-            <Content>
+            </div>
+
+            {/* Main content */}
+            <div className="flex-1 flex flex-col min-w-0 relative">
                 {videoCalling && <VideoCall onHangOffClick={() => setVideoCalling(false)} />}
                 <Routes>
                     <Route path="/settings" element={<Settings />} />
@@ -67,11 +71,15 @@ function ChatApp ({ children, ...rest }) {
                         />
                     } />
                 </Routes>
-            </Content>
-            <Drawer show={showDrawer}>
-                <Profile src={AVATAR_MAP[user.avatar]} name={user.name} onCloseClick={() => setShowDrawer(false)} />
-            </Drawer>
-        </StyledChatApp >
+            </div>
+
+            {/* Profile drawer (conditionally shown) */}
+            {showDrawer && (
+                <div className="w-72 shrink-0 border-l overflow-hidden">
+                    <Profile src={AVATAR_MAP[user.avatar]} name={user.name} onCloseClick={() => setShowDrawer(false)} />
+                </div>
+            )}
+        </div>
     )
 }
 

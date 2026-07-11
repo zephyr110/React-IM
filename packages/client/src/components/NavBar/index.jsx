@@ -1,57 +1,69 @@
-
 import React from 'react'
-import PropTypes from 'prop-types'
-import StyledNavBar, { StyledMenuItem, MenuIcon, MenuItems } from './style';
-import Badge from 'components/Badge';
-import Avatar from 'components/Avatar';
+import { Link, useLocation } from 'react-router-dom'
+import { Avatar, AvatarImage } from '@/components/ui/avatar'
+import { cn } from '@/lib/utils'
+import { MessageCircle, Users, FolderOpen, StickyNote, Settings, MoreHorizontal } from 'lucide-react'
 import avatarImg1 from 'assets/images/avatar-1.jpg'
-import { faCommentDots, faUsers, faFolder, faCog, faEllipsisH, faStickyNote } from '@fortawesome/free-solid-svg-icons';
-import { Link, matchPath, useLocation } from 'react-router-dom'
 
-function NavBar ({ children, ...rest }) {
-    return (
+const NAV_ITEMS = [
+  { to: '/', icon: MessageCircle, label: '消息' },
+  { to: '/contacts', icon: Users, label: '联系人' },
+  { to: '/files', icon: FolderOpen, label: '文件' },
+  { to: '/notes', icon: StickyNote, label: '笔记' },
+  { to: '/more', icon: MoreHorizontal, label: '更多' },
+]
 
-        <StyledNavBar {...rest}>
-            <Avatar src={avatarImg1} status='online' />
-            <MenuItems>
-                <MenuItem to='/' showBadge icon={faCommentDots} />
-                <MenuItem to='/contacts' icon={faUsers} />
-                <MenuItem to='/files' icon={faFolder} />
-                <MenuItem to='/notes' icon={faStickyNote} />
-                <MenuItem to=' ' icon={faEllipsisH} />
-                <MenuItem
-                    to='/settings'
-                    icon={faCog}
-                    css={`
-                        align-self: end;
-                    `}
-                />
-            </MenuItems>
-        </StyledNavBar>
-    )
-}
+function NavBar () {
+  const location = useLocation()
 
-function MenuItem ({ to, icon, showBadge, ...rest }) {
-    // 判断路由
-    const location = useLocation()
-    // 当前路径与传递进来的路径匹配时，显示active
-    const active = !!matchPath(to, location.pathname) ? 1 : 0
+  return (
+    <nav className='flex flex-col items-center h-full py-4 px-2 gap-1 bg-secondary/30 border-r'>
+      {/* User avatar */}
+      <div className='mb-4'>
+        <Avatar className='w-11 h-11 ring-2 ring-primary/20'>
+          <AvatarImage src={avatarImg1} alt='avatar' />
+        </Avatar>
+      </div>
 
-    return (
-        <StyledMenuItem active={active} {...rest}>
-            <Link to={to}>
-                <Badge show={showBadge}>
-                    <MenuIcon active={active} icon={icon} />
-                </Badge>
-            </Link>
-        </StyledMenuItem>
-    )
-}
+      {/* Nav items */}
+      {NAV_ITEMS.map(({ to, icon: Icon, label }) => {
+        const isActive = to === '/'
+          ? location.pathname === '/'
+          : location.pathname.startsWith(to)
+        return (
+          <Link
+            key={to}
+            to={to}
+            title={label}
+            className={cn(
+              'w-11 h-11 flex items-center justify-center rounded-xl transition-all',
+              isActive
+                ? 'bg-primary text-primary-foreground shadow-sm'
+                : 'text-muted-foreground hover:bg-accent hover:text-foreground'
+            )}
+          >
+            <Icon className='w-5 h-5' />
+          </Link>
+        )
+      })}
 
-NavBar.propTypes = {
-    children: PropTypes.any
+      <div className='flex-1' />
+
+      {/* Settings at bottom */}
+      <Link
+        to='/settings'
+        title='设置'
+        className={cn(
+          'w-11 h-11 flex items-center justify-center rounded-xl transition-all',
+          location.pathname === '/settings' || location.pathname.startsWith('/settings')
+            ? 'bg-primary text-primary-foreground shadow-sm'
+            : 'text-muted-foreground hover:bg-accent hover:text-foreground'
+        )}
+      >
+        <Settings className='w-5 h-5' />
+      </Link>
+    </nav>
+  )
 }
 
 export default NavBar
-export { MenuItem }
-

@@ -1,21 +1,15 @@
 import React, { useState, useRef, useCallback, useEffect } from 'react'
 import PropTypes from 'prop-types'
-import StyledVoiceMessage from './style'
-import Button from 'components/Button'
-import Icon from 'components/Icon'
-import Play from 'assets/icons/play.svg?react'
-import Wave from 'assets/icons/wave.svg?react'
-import { useTheme } from 'styled-components'
-import Text from 'components/Text'
+import { Play } from 'lucide-react'
+import { cn } from '@/lib/utils'
 
 function VoiceMessage ({ children, type, time, audioSrc, ...rest }) {
-    const theme = useTheme()
     const [playing, setPlaying] = useState(false)
     const [currentTime, setCurrentTime] = useState(0)
     const audioRef = useRef(null)
     const rafRef = useRef(null)
 
-    // 清理动画帧
+    // Clean up animation frame
     useEffect(() => {
         return () => {
             if (rafRef.current) {
@@ -24,7 +18,7 @@ function VoiceMessage ({ children, type, time, audioSrc, ...rest }) {
         }
     }, [])
 
-    // 更新播放进度
+    // Update playback progress
     const updateProgress = useCallback(() => {
         if (audioRef.current) {
             setCurrentTime(audioRef.current.currentTime)
@@ -34,7 +28,7 @@ function VoiceMessage ({ children, type, time, audioSrc, ...rest }) {
         }
     }, [])
 
-    // 处理音频播放/暂停
+    // Handle audio play/pause
     const handleTogglePlay = useCallback(() => {
         if (!audioRef.current) return
 
@@ -54,7 +48,7 @@ function VoiceMessage ({ children, type, time, audioSrc, ...rest }) {
         }
     }, [playing, updateProgress])
 
-    // 音频播放结束
+    // Audio playback ended
     const handleEnded = useCallback(() => {
         setPlaying(false)
         setCurrentTime(0)
@@ -64,7 +58,7 @@ function VoiceMessage ({ children, type, time, audioSrc, ...rest }) {
         }
     }, [])
 
-    // 格式化时间显示
+    // Format time display
     const formatTime = (secs) => {
         if (typeof secs === 'string') return secs
         const totalSecs = Math.floor(secs)
@@ -76,31 +70,57 @@ function VoiceMessage ({ children, type, time, audioSrc, ...rest }) {
     }
 
     const displayTime = playing ? formatTime(currentTime) : (time || '')
+    const isMine = type === 'mine'
 
     return (
-        <StyledVoiceMessage type={type} {...rest}>
-            <Button size='40px' onClick={handleTogglePlay}>
-                <Icon
-                    icon={Play}
-                    color='#fff'
-                    width='14'
-                    height='16'
-                    style={{
-                        transform: 'translateX(1px)',
-                        opacity: playing ? 0.6 : 1,
-                    }}
+        <div
+            className={cn(
+                'flex items-center gap-3 px-3 py-2 rounded-2xl',
+                isMine ? 'bg-primary text-white' : 'bg-muted'
+            )}
+            {...rest}
+        >
+            {/* Play button */}
+            <button
+                className={cn(
+                    'w-8 h-8 rounded-full flex items-center justify-center shrink-0 transition-colors',
+                    isMine
+                        ? 'bg-white text-primary hover:bg-white/90'
+                        : 'bg-primary text-white hover:bg-primary/90'
+                )}
+                onClick={handleTogglePlay}
+            >
+                <Play
+                    className={cn('w-4 h-4 ml-0.5', playing && 'opacity-60')}
+                    fill="currentColor"
                 />
-            </Button>
-            <Icon
-                icon={Wave}
-                width='100%'
-                height='100%'
-                color={theme.primaryColor}
-                style={{ opacity: playing ? 0.7 : 1 }}
-            />
-            <Text bold>{displayTime}</Text>
+            </button>
+
+            {/* Wave visualization bars */}
+            <div className="flex-1 flex items-end gap-[2px] h-6">
+                {[35, 55, 40, 70, 45, 60, 30, 50, 65, 38, 55, 42, 68, 48, 58, 33, 52, 62, 40, 55].map((h, i) => (
+                    <div
+                        key={i}
+                        className={cn(
+                            'w-[3px] rounded-full transition-all',
+                            isMine ? 'bg-white' : 'bg-primary'
+                        )}
+                        style={{
+                            height: `${h}%`,
+                            opacity: playing ? 0.9 : 0.35,
+                        }}
+                    />
+                ))}
+            </div>
+
+            {/* Duration */}
+            <span className={cn('text-sm font-medium shrink-0', isMine && 'text-white')}>
+                {displayTime}
+            </span>
+
+            {/* Hidden audio element */}
             {audioSrc && <audio ref={audioRef} src={audioSrc} onEnded={handleEnded} preload='auto' />}
-        </StyledVoiceMessage>
+        </div>
     )
 }
 

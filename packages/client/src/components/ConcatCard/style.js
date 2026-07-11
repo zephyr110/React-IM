@@ -31,3 +31,4 @@ const StyledConcatCard = styled.div`
 
 export default StyledConcatCard
 export { Name, Intro }
+

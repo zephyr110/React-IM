@@ -1,14 +1,24 @@
 import React from 'react'
 import PropTypes from 'prop-types'
-import StyledSettings, { StyledSettingsItem, SettingsItemControl, StyledSettingsGroup } from './style'
-import Paragraph from 'components/Paragraph'
-import Switch from 'components/Switch'
-import Icon from 'components/Icon'
-import Seperator from 'components/Seperator'
-import ArrowMenuRight from 'assets/icons/arrowRight.svg?react'
+import { ChevronRight } from 'lucide-react'
+import { Separator } from '@/components/ui/separator'
 import { Link } from 'react-router-dom'
 import { useSpring, animated } from 'react-spring'
 import useSettings from 'hooks/useSettings'
+
+function ToggleSwitch ({ checked = false, onChange }) {
+    return (
+        <label className="relative inline-flex items-center cursor-pointer">
+            <input
+                type="checkbox"
+                className="sr-only peer"
+                checked={checked}
+                onChange={(e) => onChange && onChange(e.target.checked)}
+            />
+            <div className="w-9 h-5 bg-gray-200 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-primary/30 dark:peer-focus:ring-primary/30 rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-primary" />
+        </label>
+    )
+}
 
 function Settings ({ children, ...rest }) {
     const settingAnimation = useSpring({
@@ -21,7 +31,7 @@ function Settings ({ children, ...rest }) {
     const { settings, updateSetting } = useSettings()
 
     return (
-        <StyledSettings {...rest}>
+        <div className="p-[72px]" {...rest}>
             <animated.div style={settingAnimation}>
                 <SettingsGroup groupName='隐私设置'>
                     <SettingsItem
@@ -64,29 +74,29 @@ function Settings ({ children, ...rest }) {
                         onChange={(v) => updateSetting('sound', v)}
                     />
                     <Link
-                        to={`/settings/blocked`}
-                        css={`text-decoration: none; color: inherit;`}
+                        to="/settings/blocked"
+                        className="no-underline text-inherit"
                     >
                         <SettingsItem label='查看已静音的好友列表' type='menu' />
                     </Link>
                 </SettingsGroup>
             </animated.div>
-        </StyledSettings>
+        </div>
     )
 }
 
 function SettingsGroup ({ groupName, children, ...rest }) {
     return (
-        <StyledSettingsGroup>
-            <Paragraph size='large' style={{ paddingBottom: '24px' }}>
+        <div className="mb-8" {...rest}>
+            <p className="text-lg font-medium pb-6">
                 {groupName}
-            </Paragraph>
+            </p>
             {children}
-        </StyledSettingsGroup>
+        </div>
     )
 }
 
-export function SettingsItem ({
+function SettingsItem ({
     type = 'switch',
     label,
     description,
@@ -96,21 +106,25 @@ export function SettingsItem ({
     ...rest
 }) {
     return (
-        <StyledSettingsItem {...rest}>
-            <SettingsItemControl>
-                <Paragraph size='normal'>{label}</Paragraph>
-                {type === 'switch' && <Switch checked={checked} onChange={onChange} style={{ transform: 'scale(0.8)' }} />}
-                {type === 'menu' && <Icon icon={ArrowMenuRight} color={'#cacbd2'} style={{ transform: 'scale(0.8)' }} />}
-            </SettingsItemControl>
+        <div {...rest}>
+            <div className="flex justify-between items-center">
+                <p className="text-sm font-medium">{label}</p>
+                {type === 'switch' && (
+                    <ToggleSwitch checked={checked} onChange={onChange} />
+                )}
+                {type === 'menu' && (
+                    <ChevronRight className="w-4 h-4 text-muted-foreground" />
+                )}
+            </div>
 
             {description && (
-                <Paragraph type='secondary' style={{ margin: '4px 0' }}>
+                <p className="text-xs text-muted-foreground mt-1">
                     {description}
-                </Paragraph>
+                </p>
             )}
 
-            <Seperator style={{ marginTop: '8px', marginBottom: '20px' }} />
-        </StyledSettingsItem>
+            <Separator className="mt-2 mb-5" />
+        </div>
     )
 }
 

@@ -1,300 +1,250 @@
 import React, { useState, useRef, useMemo } from 'react'
-import PropTypes from 'prop-types'
-import StyledFooter, {
-  IconContainer,
-  StyledPopoverContent,
-  EmojiGrid,
-  EmojiItem,
-  CategoryTabs,
-  CategoryTab,
-  RecordingIndicator,
-  RecordingDot,
-  RecordingTime,
-  RecordingCancelHint,
-} from './style'
-import Input from 'components/Input'
-import Icon from 'components/Icon'
-import ClipIcon from 'assets/icons/clip.svg?react'
-import SmileIcon from 'assets/icons/smile.svg?react'
-import MicrphoneIcon from 'assets/icons/microphone.svg?react'
-import PlaneIcon from 'assets/icons/plane.svg?react'
-import CrossIcon from 'assets/icons/cross.svg?react'
-import Button from 'components/Button'
-import Popover from 'components/Popover'
-import { useTheme } from 'styled-components'
+import { Button } from '@/components/ui/button'
 import { useMessages } from 'context/MessageContext'
-import emojis, { categoryLabels } from 'data/emoji'
 import useVoiceRecorder from 'hooks/useVoiceRecorder'
 import useDrafts from 'hooks/useDrafts'
+import emojis, { categoryLabels } from 'data/emoji'
+import { cn } from '@/lib/utils'
+import { Smile, Mic, Send, Paperclip, X } from 'lucide-react'
 
 const EMOJI_CATEGORIES = Object.keys(emojis)
 
-function Footer ({
-    children,
-    footerAnimation,
-    style,
-    ...rest
-}) {
-    const [emojiIconActive, setEmojiIconActive] = useState(false)
-    const { saveDraft, getDraft, clearDraft } = useDrafts()
-    const theme = useTheme()
-    const { sendTextMessage, sendVoiceMessage, sendImageMessage, activeContactId } = useMessages()
-    const inputRef = useRef(null)
-    const prevContactRef = useRef(activeContactId)
+function Footer ({ footerAnimation, style, ...rest }) {
+  const [emojiOpen, setEmojiOpen] = useState(false)
+  const [activeCategory, setActiveCategory] = useState(EMOJI_CATEGORIES[0])
+  const { saveDraft, getDraft, clearDraft } = useDrafts()
+  const { sendTextMessage, sendVoiceMessage, sendImageMessage, activeContactId } = useMessages()
+  const inputRef = useRef(null)
+  const fileInputRef = useRef(null)
+  const emojiRef = useRef(null)
+  const prevContactRef = useRef(activeContactId)
 
-    // State - restore draft for current contact
-    const [inputValue, setInputValue] = useState(() => getDraft(activeContactId))
-    // 引用回复状态
-    const [quoteMessage, setQuoteMessage] = useState(null)
-    // 图片发送状态
-    const [imagePreview, setImagePreview] = useState(null)
-    const fileInputRef = useRef(null)
+  const [inputValue, setInputValue] = useState(() => getDraft(activeContactId))
+  const [quoteMessage, setQuoteMessage] = useState(null)
+  const [imagePreview, setImagePreview] = useState(null)
 
-    // Save draft when switching contacts
-    if (prevContactRef.current !== activeContactId) {
-        saveDraft(prevContactRef.current, inputValue)
-        setInputValue(getDraft(activeContactId))
-        prevContactRef.current = activeContactId
+  const {
+    recordingState, duration, audioBlob,
+    startRecording, stopRecording, cancelRecording, cleanupAudio,
+  } = useVoiceRecorder({ maxDuration: 60 })
+
+  // Draft switching
+  if (prevContactRef.current !== activeContactId) {
+    saveDraft(prevContactRef.current, inputValue)
+    setInputValue(getDraft(activeContactId))
+    prevContactRef.current = activeContactId
+  }
+
+  const imagePreviewUrl = useMemo(() => {
+    return imagePreview ? URL.createObjectURL(imagePreview) : null
+  }, [imagePreview])
+
+  // Expose for ChatBubble right-click quote
+  if (typeof window !== 'undefined') {
+    window.__setQuoteMessage = setQuoteMessage
+  }
+
+  const handleSend = () => {
+    if (!inputValue.trim() && !imagePreview) return
+    if (imagePreview) {
+      sendImageMessage(imagePreview)
+      if (imagePreviewUrl) URL.revokeObjectURL(imagePreviewUrl)
+      setImagePreview(null)
+      setInputValue('')
+      return
     }
-    const {
-        recordingState,
-        duration,
-        audioBlob,
-        startRecording,
-        stopRecording,
-        cancelRecording,
-        cleanupAudio,
-    } = useVoiceRecorder({ maxDuration: 60 })
+    sendTextMessage(inputValue, quoteMessage)
+    setInputValue('')
+    setQuoteMessage(null)
+    clearDraft(activeContactId)
+  }
 
-    // 简单写法：不用 useCallback，避免闭包问题
-    const handleSend = () => {
-        if (!inputValue.trim() && !imagePreview) return
-        if (imagePreview) {
-            sendImageMessage(imagePreview)
-            setImagePreview(null)
-            setInputValue('')
-            clearDraft(activeContactId)
-            return
-        }
-        sendTextMessage(inputValue, quoteMessage)
-        setInputValue('')
-        setQuoteMessage(null)
-        clearDraft(activeContactId)
+  const handleKeyDown = (e) => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault()
+      handleSend()
     }
+  }
 
-    const handleKeyDown = (e) => {
-        if (e.key === 'Enter' && !e.shiftKey) {
-            e.preventDefault()
-            handleSend()
-        }
-        if (e.key === 'Enter' && e.ctrlKey) {
-            e.preventDefault()
-            handleSend()
-        }
+  const handleChange = (e) => {
+    setInputValue(e.target.value)
+    saveDraft(activeContactId, e.target.value)
+  }
+
+  const handleEmojiClick = (emoji) => {
+    const input = inputRef.current
+    if (input) {
+      const start = input.selectionStart || inputValue.length
+      const end = input.selectionEnd || inputValue.length
+      const newVal = inputValue.slice(0, start) + emoji + inputValue.slice(end)
+      setInputValue(newVal)
+      requestAnimationFrame(() => {
+        const pos = start + emoji.length
+        input.setSelectionRange(pos, pos)
+        input.focus()
+      })
+    } else {
+      setInputValue(prev => prev + emoji)
     }
+  }
 
-    const handleChange = (e) => {
-        setInputValue(e.target.value)
-        saveDraft(activeContactId, e.target.value)
-    }
+  const handleMicClick = () => {
+    recordingState === 'idle' ? startRecording() : stopRecording()
+  }
 
-    const handleClipClick = () => {
-        fileInputRef.current?.click()
-    }
+  const handleImageSelect = (e) => {
+    const file = e.target.files?.[0]
+    if (!file || !file.type.startsWith('image/')) return
+    if (file.size > 5 * 1024 * 1024) { alert('图片大小不能超过5MB'); return }
+    if (imagePreviewUrl) URL.revokeObjectURL(imagePreviewUrl)
+    setImagePreview(file)
+    e.target.value = ''
+  }
 
-    const handleImageSelect = (e) => {
-        const file = e.target.files?.[0]
-        if (!file || !file.type.startsWith('image/')) return
-        if (file.size > 5 * 1024 * 1024) {
-            alert('图片大小不能超过5MB')
-            return
-        }
-        setImagePreview(file)
-        e.target.value = ''
-    }
+  const handleCancelImage = () => {
+    if (imagePreviewUrl) URL.revokeObjectURL(imagePreviewUrl)
+    setImagePreview(null)
+  }
 
-    const imagePreviewUrl = useMemo(() => {
-        return imagePreview ? URL.createObjectURL(imagePreview) : null
-    }, [imagePreview])
+  const handleCancelQuote = () => setQuoteMessage(null)
+  const handleCancelVoice = () => cancelRecording()
+  const handleSendVoice = () => {
+    if (!audioBlob) return
+    sendVoiceMessage(audioBlob, duration)
+    cleanupAudio()
+  }
 
-    const handleCancelImage = () => {
-        if (imagePreviewUrl) URL.revokeObjectURL(imagePreviewUrl)
-        setImagePreview(null)
-    }
+  const formatDuration = (s) => {
+    const m = Math.floor(s / 60)
+    const sec = s % 60
+    return m > 0 ? `${m}:${String(sec).padStart(2, '0')}` : `${sec}"`
+  }
 
-    const handleCancelQuote = () => {
-        setQuoteMessage(null)
-    }
+  const disabled = !activeContactId
 
-    // 将表情符号插入到输入框光标位置
-    const handleEmojiClick = (emojiChar) => {
-        const input = inputRef.current
-        if (input) {
-            const start = input.selectionStart || inputValue.length
-            const end = input.selectionEnd || inputValue.length
-            const newValue = inputValue.slice(0, start) + emojiChar + inputValue.slice(end)
-            setInputValue(newValue)
-            requestAnimationFrame(() => {
-                const newPos = start + emojiChar.length
-                input.setSelectionRange(newPos, newPos)
-                input.focus()
-            })
-        } else {
-            setInputValue(prev => prev + emojiChar)
-        }
-    }
-
-    const handleMicClick = () => {
-        if (recordingState === 'idle') {
-            startRecording()
-        } else if (recordingState === 'recording') {
-            stopRecording()
-        }
-    }
-
-    const handleSendVoice = () => {
-        if (!audioBlob) return
-        sendVoiceMessage(audioBlob, duration)
-        cleanupAudio()
-    }
-
-    const handleCancelVoice = () => {
-        cancelRecording()
-    }
-
-    const formatDuration = (seconds) => {
-        const mins = Math.floor(seconds / 60)
-        const secs = seconds % 60
-        return mins > 0 ? `${mins}:${secs.toString().padStart(2, '0')}` : `${secs}"`
-    }
-
-    // Expose setQuoteMessage for external use via a global ref
-    if (typeof window !== 'undefined') {
-        window.__setQuoteMessage = setQuoteMessage
-    }
-
-    const renderSuffix = () => {
-        if (recordingState === 'recording') {
-            return (
-                <IconContainer>
-                    <RecordingIndicator>
-                        <RecordingDot />
-                        <RecordingTime>{formatDuration(duration)}</RecordingTime>
-                        <RecordingCancelHint>点击停止</RecordingCancelHint>
-                    </RecordingIndicator>
-                    <Icon icon={CrossIcon} style={{ cursor: 'pointer' }} onClick={handleCancelVoice} />
-                </IconContainer>
-            )
-        }
-
-        if (recordingState === 'done') {
-            return (
-                <IconContainer>
-                    <RecordingIndicator style={{ animation: 'none' }}>
-                        <RecordingTime>{formatDuration(duration)}</RecordingTime>
-                    </RecordingIndicator>
-                    <Icon icon={CrossIcon} style={{ cursor: 'pointer' }} onClick={handleCancelVoice} />
-                    <Button size='42px' onClick={handleSendVoice}>
-                        <Icon icon={PlaneIcon} color='#fff' style={{ transform: 'translateX(-2px)' }} />
-                    </Button>
-                </IconContainer>
-            )
-        }
-
-        return (
-            <IconContainer>
-                <Popover
-                    content={<EmojiPickerContent onEmojiClick={handleEmojiClick} />}
-                    offset={{ x: '-25%' }}
-                    onVisible={() => setEmojiIconActive(true)}
-                    onHide={() => setEmojiIconActive(false)}
-                >
-                    <Icon icon={SmileIcon} color={emojiIconActive ? undefined : theme.gray3} style={{ cursor: 'pointer' }} />
-                </Popover>
-                <Icon icon={MicrphoneIcon} style={{ cursor: 'pointer' }} onClick={handleMicClick} />
-                <Button size='42px' onClick={handleSend}>
-                    <Icon icon={PlaneIcon} color='#fff' style={{ transform: 'translateX(-2px)' }} />
-                </Button>
-            </IconContainer>
-        )
-    }
-
+  // Recording state
+  if (recordingState === 'recording') {
     return (
-        <StyledFooter style={{ ...style, ...footerAnimation }} {...rest}>
-            {/* 引用消息栏 */}
-            {quoteMessage && (
-                <div style={{
-                    display: 'flex', alignItems: 'center', padding: '8px 12px',
-                    background: theme.gray2, borderRadius: 8, marginBottom: 8,
-                    fontSize: 13, color: theme.gray3
-                }}>
-                    <span style={{ flex: 1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                        回复: {quoteMessage.content?.substring(0, 50)}
-                    </span>
-                    <Icon icon={CrossIcon} style={{ cursor: 'pointer', marginLeft: 8 }} onClick={handleCancelQuote} />
-                </div>
-            )}
-
-            {/* 图片预览 */}
-            {imagePreview && (
-                <div style={{ display: 'flex', alignItems: 'center', padding: '4px 12px', marginBottom: 8 }}>
-                    <img
-                        src={imagePreviewUrl}
-                        alt="preview"
-                        style={{ maxHeight: 80, borderRadius: 8 }}
-                    />
-                    <Icon icon={CrossIcon} style={{ cursor: 'pointer', marginLeft: 8 }} onClick={handleCancelImage} />
-                </div>
-            )}
-
-            {/* 隐藏的文件选择器 */}
-            <input
-                type="file"
-                ref={fileInputRef}
-                style={{ display: 'none' }}
-                accept="image/*"
-                onChange={handleImageSelect}
-            />
-
-            <Input
-                multiline
-                placeholder='请输入想和对方说的话，Shift+Enter 换行'
-                value={inputValue}
-                onChange={handleChange}
-                onKeyDown={handleKeyDown}
-                disabled={!activeContactId || recordingState !== 'idle'}
-                prefix={recordingState === 'idle' ? <Icon icon={ClipIcon} style={{ cursor: 'pointer' }} onClick={handleClipClick} /> : null}
-                suffix={renderSuffix()}
-                ref={inputRef}
-            />
-        </StyledFooter>
+      <div className='border-t bg-background px-4 py-3' {...rest}>
+        <div className='flex items-center gap-3'>
+          <div className='flex-1 flex items-center gap-2 px-4 py-2 bg-red-50 rounded-full'>
+            <span className='w-2 h-2 rounded-full bg-red-500 animate-pulse' />
+            <span className='text-sm text-red-600 font-medium'>{formatDuration(duration)}</span>
+            <span className='text-xs text-red-400 ml-2'>点击停止</span>
+          </div>
+          <Button variant='ghost' size='icon' onClick={handleCancelVoice} className='shrink-0'>
+            <X className='w-4 h-4' />
+          </Button>
+        </div>
+      </div>
     )
-}
+  }
 
-function EmojiPickerContent ({ onEmojiClick }) {
-    const [activeCategory, setActiveCategory] = useState(EMOJI_CATEGORIES[0])
-
+  if (recordingState === 'done') {
     return (
-        <StyledPopoverContent>
-            <CategoryTabs>
+      <div className='border-t bg-background px-4 py-3' {...rest}>
+        <div className='flex items-center gap-3'>
+          <div className='flex-1 flex items-center gap-2 px-4 py-2 bg-blue-50 rounded-full'>
+            <span className='text-sm text-blue-600 font-medium'>{formatDuration(duration)}</span>
+            <span className='text-xs text-blue-400'>语音消息就绪</span>
+          </div>
+          <Button variant='ghost' size='icon' onClick={handleCancelVoice}><X className='w-4 h-4' /></Button>
+          <Button size='icon' onClick={handleSendVoice}><Send className='w-4 h-4' /></Button>
+        </div>
+      </div>
+    )
+  }
+
+  return (
+    <div className='border-t bg-background px-4 py-3' {...rest}>
+      {/* Quote bar */}
+      {quoteMessage && (
+        <div className='flex items-center gap-2 mb-2 px-3 py-1.5 bg-muted/50 rounded-lg text-xs text-muted-foreground'>
+          <span className='flex-1 truncate'>回复: {quoteMessage.content?.substring(0, 50)}</span>
+          <button onClick={handleCancelQuote} className='hover:text-foreground'><X className='w-3 h-3' /></button>
+        </div>
+      )}
+      {/* Image preview */}
+      {imagePreview && (
+        <div className='flex items-center gap-2 mb-2'>
+          <img src={imagePreviewUrl} alt='preview' className='h-16 rounded-lg object-cover' />
+          <button onClick={handleCancelImage} className='p-1 rounded-full bg-muted hover:bg-muted/80'><X className='w-3 h-3' /></button>
+        </div>
+      )}
+
+      {/* Input area */}
+      <div className='flex items-end gap-2'>
+        {/* Clip button */}
+        <Button variant='ghost' size='icon' className='shrink-0' onClick={() => fileInputRef.current?.click()} disabled={disabled}>
+          <Paperclip className='w-5 h-5 text-muted-foreground' />
+        </Button>
+        <input type='file' ref={fileInputRef} className='hidden' accept='image/*' onChange={handleImageSelect} />
+
+        {/* Text input */}
+        <div className='flex-1 relative'>
+          <textarea
+            ref={inputRef}
+            value={inputValue}
+            onChange={handleChange}
+            onKeyDown={handleKeyDown}
+            disabled={disabled}
+            placeholder={disabled ? '请先选择联系人' : '输入消息，Enter 发送，Shift+Enter 换行'}
+            rows={1}
+            className='w-full resize-none rounded-2xl border border-input bg-muted/50 px-4 py-2.5 text-sm 
+              placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:border-transparent
+              disabled:opacity-50 disabled:cursor-not-allowed min-h-[42px] max-h-[120px]'
+          />
+        </div>
+
+        {/* Emoji button */}
+        <div className='relative' ref={emojiRef}>
+          <Button variant='ghost' size='icon' className='shrink-0' onClick={() => setEmojiOpen(!emojiOpen)} disabled={disabled}>
+            <Smile className='w-5 h-5 text-muted-foreground' />
+          </Button>
+          {/* Emoji popover */}
+          {emojiOpen && (
+            <div className='absolute bottom-full mb-2 right-0 w-72 bg-popover border rounded-xl shadow-xl z-50 animate-fade-in'>
+              <div className='flex gap-0.5 p-1 border-b overflow-x-auto'>
                 {EMOJI_CATEGORIES.map((cat) => (
-                    <CategoryTab key={cat} $active={activeCategory === cat} onClick={(e) => { e.stopPropagation(); setActiveCategory(cat) }}>
-                        {categoryLabels[cat]}
-                    </CategoryTab>
+                  <button
+                    key={cat}
+                    onClick={(e) => { e.stopPropagation(); setActiveCategory(cat) }}
+                    className={cn(
+                      'shrink-0 px-2 py-1 text-xs rounded-md whitespace-nowrap transition-colors',
+                      activeCategory === cat ? 'bg-primary text-primary-foreground' : 'hover:bg-muted text-muted-foreground'
+                    )}
+                  >
+                    {categoryLabels[cat]}
+                  </button>
                 ))}
-            </CategoryTabs>
-            <EmojiGrid>
-                {emojis[activeCategory].map((emojiChar, index) => (
-                    <EmojiItem key={`${activeCategory}-${index}`} onClick={() => onEmojiClick(emojiChar)} title={emojiChar}>
-                        {emojiChar}
-                    </EmojiItem>
+              </div>
+              <div className='grid grid-cols-8 gap-0.5 p-2 max-h-48 overflow-y-auto'>
+                {emojis[activeCategory].map((emoji, i) => (
+                  <button
+                    key={`${activeCategory}-${i}`}
+                    onClick={() => { handleEmojiClick(emoji); setEmojiOpen(false) }}
+                    className='w-8 h-8 flex items-center justify-center text-lg rounded hover:bg-muted transition-colors'
+                  >
+                    {emoji}
+                  </button>
                 ))}
-            </EmojiGrid>
-        </StyledPopoverContent>
-    )
-}
+              </div>
+            </div>
+          )}
+        </div>
 
-EmojiPickerContent.propTypes = { onEmojiClick: PropTypes.func.isRequired }
-Footer.propTypes = { children: PropTypes.any, footerAnimation: PropTypes.object, style: PropTypes.object }
+        {/* Mic button */}
+        <Button variant='ghost' size='icon' className='shrink-0' onClick={handleMicClick} disabled={disabled}>
+          <Mic className='w-5 h-5 text-muted-foreground' />
+        </Button>
+
+        {/* Send button */}
+        <Button size='icon' onClick={handleSend} disabled={disabled || (!inputValue.trim() && !imagePreview)} className='shrink-0'>
+          <Send className='w-4 h-4' />
+        </Button>
+      </div>
+    </div>
+  )
+}
 
 export default Footer

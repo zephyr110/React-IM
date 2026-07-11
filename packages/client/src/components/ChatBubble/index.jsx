@@ -1,117 +1,107 @@
 import React, { useState } from 'react'
-import PropTypes from 'prop-types'
-import StyledChatBubble, { Time, BubbleTip, Bubble, MessageText, QuoteCard, ImageContent, RevokedText, ReadStatus, ContextMenu, ContextMenuItem } from './style'
-import BubbleTipIcon from 'assets/icons/bubbleTip.svg?react'
+import { cn } from '@/lib/utils'
+import { Quote, Trash2 } from 'lucide-react'
 
 function ChatBubble ({ children, type, time, message, ...rest }) {
-    const [showMenu, setShowMenu] = useState(false)
-    const [menuPos, setMenuPos] = useState({ x: 0, y: 0 })
+  const [showMenu, setShowMenu] = useState(false)
+  const [menuPos, setMenuPos] = useState({ x: 0, y: 0 })
 
-    const handleContextMenu = (e) => {
-        e.preventDefault()
-        setMenuPos({ x: e.clientX, y: e.clientY })
-        setShowMenu(true)
+  const handleContextMenu = (e) => {
+    e.preventDefault()
+    setMenuPos({ x: e.clientX, y: e.clientY })
+    setShowMenu(true)
+  }
+
+  const handleQuote = () => {
+    if (message && typeof window !== 'undefined' && window.__setQuoteMessage) {
+      window.__setQuoteMessage(message)
     }
+    setShowMenu(false)
+  }
 
-    const handleCloseMenu = () => {
-        setShowMenu(false)
-    }
+  const isMine = type === 'mine'
 
-    const handleQuote = () => {
-        if (message && typeof window !== 'undefined' && window.__setQuoteMessage) {
-            window.__setQuoteMessage(message)
-        }
-        setShowMenu(false)
-    }
-
-    // Handle image messages
-    if (message?.type === 'image') {
-        return (
-            <StyledChatBubble type={type} {...rest} onContextMenu={handleContextMenu}>
-                <Bubble style={{ padding: 4, background: 'transparent', boxShadow: 'none' }}>
-                    <ImageContent
-                        src={message.content}
-                        alt="sent image"
-                        onClick={() => window.open(message.content, '_blank')}
-                    />
-                </Bubble>
-                <Time>{time}</Time>
-                {message.read && type === 'mine' && <ReadStatus>已读</ReadStatus>}
-                {/* Context menu */}
-                {showMenu && (
-                    <ContextMenu style={{ left: menuPos.x, top: menuPos.y, position: 'fixed' }} onClick={handleCloseMenu}>
-                        <ContextMenuItem onClick={handleQuote}>引用</ContextMenuItem>
-                    </ContextMenu>
-                )}
-            </StyledChatBubble>
-        )
-    }
-
-    // Handle revoked messages
-    if (message?.revoked) {
-        return (
-            <StyledChatBubble type={type} {...rest}>
-                <Bubble>
-                    <RevokedText>
-                        {type === 'mine' ? '你撤回了一条消息' : '对方撤回了一条消息'}
-                    </RevokedText>
-                </Bubble>
-                <Time>{time}</Time>
-            </StyledChatBubble>
-        )
-    }
-
-    // Render message content with @mention highlighting
-    const renderContent = () => {
-        if (!children || typeof children !== 'string') return children
-
-        // Highlight @mentions
-        const parts = children.split(/(@\S+)/g)
-        return parts.map((part, i) => {
-            if (part.startsWith('@')) {
-                return <span key={i} style={{ color: '#4f9dde', fontWeight: 'bold' }}>{part}</span>
-            }
-            return part
-        })
-    }
-
+  // Image message
+  if (message?.type === 'image') {
     return (
-        <StyledChatBubble type={type} {...rest} onContextMenu={handleContextMenu}>
-            <Bubble>
-                <BubbleTip icon={BubbleTipIcon} width={40} height={28} color='#fff' />
-                {/* Quoted message card */}
-                {message?.quote && (
-                    <QuoteCard>
-                        <div style={{ fontSize: 12, color: '#999', marginBottom: 2 }}>
-                            {message.quote.from === (message.from) ? '自己' : '对方'}
-                        </div>
-                        <div style={{ fontSize: 13, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                            {message.quote.content?.substring(0, 80)}
-                        </div>
-                    </QuoteCard>
-                )}
-                <MessageText>{renderContent()}</MessageText>
-            </Bubble>
-            <Time>{time}</Time>
-            {message?.read && type === 'mine' && <ReadStatus>已读</ReadStatus>}
-            {/* Right-click context menu */}
-            {showMenu && (
-                <ContextMenu
-                    style={{ left: menuPos.x, top: menuPos.y, position: 'fixed', zIndex: 10000 }}
-                    onClick={handleCloseMenu}
-                >
-                    <ContextMenuItem onClick={handleQuote}>引用</ContextMenuItem>
-                </ContextMenu>
-            )}
-        </StyledChatBubble>
+      <div className={cn('flex flex-col mb-3', isMine ? 'items-end' : 'items-start')} onContextMenu={handleContextMenu}>
+        <div className='p-1 rounded-2xl overflow-hidden max-w-[220px] shadow-sm'>
+          <img
+            src={message.content}
+            alt='sent'
+            className='rounded-xl cursor-pointer hover:opacity-90 transition-opacity max-w-full'
+            onClick={() => window.open(message.content, '_blank')}
+          />
+        </div>
+        <span className='text-[11px] text-muted-foreground mt-1 px-1'>{time}</span>
+        {message.read && isMine && <span className='text-[10px] text-muted-foreground'>已读</span>}
+        {showMenu && (
+          <div className='fixed z-50 bg-popover border rounded-lg shadow-lg p-1 min-w-[80px]' style={{ left: menuPos.x, top: menuPos.y }} onClick={() => setShowMenu(false)}>
+            <button className='flex items-center gap-2 w-full px-3 py-1.5 text-sm rounded hover:bg-accent' onClick={handleQuote}>
+              <Quote className='w-3.5 h-3.5' /> 引用
+            </button>
+          </div>
+        )}
+      </div>
     )
-}
+  }
 
-ChatBubble.propTypes = {
-    children: PropTypes.any,
-    type: PropTypes.oneOf(['mine']),
-    time: PropTypes.string,
-    message: PropTypes.object,
+  // Revoked message
+  if (message?.revoked) {
+    return (
+      <div className={cn('flex flex-col mb-3', isMine ? 'items-end' : 'items-start')}>
+        <div className='px-4 py-2 rounded-2xl bg-muted/50 italic text-muted-foreground text-sm'>
+          {isMine ? '你撤回了一条消息' : '对方撤回了一条消息'}
+        </div>
+        <span className='text-[11px] text-muted-foreground mt-1 px-1'>{time}</span>
+      </div>
+    )
+  }
+
+  return (
+    <div className={cn('flex flex-col mb-3', isMine ? 'items-end' : 'items-start')} onContextMenu={handleContextMenu}>
+      <div className={cn(
+        'relative px-4 py-2.5 rounded-2xl max-w-[75%] shadow-sm',
+        isMine ? 'bg-primary text-primary-foreground rounded-br-md' : 'bg-secondary text-secondary-foreground rounded-bl-md'
+      )}>
+        {/* Quoted message card */}
+        {message?.quote && (
+          <div className={cn(
+            'mb-2 px-2.5 py-1.5 rounded-lg text-xs border-l-[3px]',
+            isMine ? 'bg-white/10 border-white/30 text-white/80' : 'bg-black/5 border-primary text-foreground/70'
+          )}>
+            <div className='font-medium mb-0.5 opacity-60'>
+              {message.quote.from === message.from ? '自己' : '对方'}
+            </div>
+            <div className='truncate max-w-[200px]'>
+              {message.quote.content?.substring(0, 50)}
+            </div>
+          </div>
+        )}
+        {/* Message content with @mention highlighting */}
+        <div className='text-[15px] leading-relaxed whitespace-pre-wrap break-words'>
+          {typeof children === 'string'
+            ? children.split(/(@\S+)/g).map((part, i) =>
+                part.startsWith('@')
+                  ? <span key={i} className={cn('font-semibold', isMine ? 'text-white' : 'text-primary')}>{part}</span>
+                  : part
+              )
+            : children
+          }
+        </div>
+      </div>
+      <span className='text-[11px] text-muted-foreground mt-1 px-1'>{time}</span>
+      {message?.read && isMine && <span className='text-[10px] text-muted-foreground'>已读</span>}
+      {/* Context menu */}
+      {showMenu && (
+        <div className='fixed z-50 bg-popover border rounded-lg shadow-lg p-1 min-w-[80px]' style={{ left: menuPos.x, top: menuPos.y }} onClick={() => setShowMenu(false)}>
+          <button className='flex items-center gap-2 w-full px-3 py-1.5 text-sm rounded hover:bg-accent' onClick={handleQuote}>
+            <Quote className='w-3.5 h-3.5' /> 引用
+          </button>
+        </div>
+      )}
+    </div>
+  )
 }
 
 export default ChatBubble
