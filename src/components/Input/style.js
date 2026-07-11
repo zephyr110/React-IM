@@ -15,6 +15,25 @@ const StyledInput = styled.input`
     }
 `
 
+const StyledTextArea = styled.textarea`
+    outline: none;
+    width: 100%;
+    min-height: 48px;
+    max-height: 120px;
+    border: none;
+    background: none;
+    color: ${({ theme }) => theme.grayDark};
+    font-size: ${({ theme }) => theme.medium};
+    display: block;
+    resize: none;
+    padding: 12px 0;
+    font-family: inherit;
+    line-height: 1.5;
+    &::placeholder {
+        color: ${({ theme }) => theme.gray3};
+    }
+`
+
 const Prefix = styled.div`
     margin-right: 16px;
 `
@@ -33,4 +52,4 @@ const InputContainer = styled.div`
 
 export default StyledInput
 
-export { Prefix, Suffix, InputContainer }
+export { Prefix, Suffix, InputContainer, StyledTextArea }

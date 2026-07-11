@@ -1,19 +1,33 @@
-
-import React, { useState } from 'react'
+import React, { useState, useRef } from 'react'
 import PropTypes from 'prop-types'
-import StyledFooter, { IconContainer, StyledPopoverContent } from './style'
+import StyledFooter, {
+  IconContainer,
+  StyledPopoverContent,
+  EmojiGrid,
+  EmojiItem,
+  CategoryTabs,
+  CategoryTab,
+  RecordingIndicator,
+  RecordingDot,
+  RecordingTime,
+  RecordingCancelHint,
+} from './style'
 import Input from 'components/Input'
 import Icon from 'components/Icon'
 import ClipIcon from 'assets/icons/clip.svg?react'
 import SmileIcon from 'assets/icons/smile.svg?react'
 import MicrphoneIcon from 'assets/icons/microphone.svg?react'
 import PlaneIcon from 'assets/icons/plane.svg?react'
-import OptionsIcon from 'assets/icons/options.svg?react'
+import CrossIcon from 'assets/icons/cross.svg?react'
 import Button from 'components/Button'
-import Emoji from 'components/Emoji'
 import Popover from 'components/Popover'
 import { useTheme } from 'styled-components'
 import { useMessages } from 'context/MessageContext'
+import emojis, { categoryLabels } from 'data/emoji'
+import useVoiceRecorder from 'hooks/useVoiceRecorder'
+import useDrafts from 'hooks/useDrafts'
+
+const EMOJI_CATEGORIES = Object.keys(emojis)
 
 function Footer ({
     children,
@@ -22,81 +36,180 @@ function Footer ({
     ...rest
 }) {
     const [emojiIconActive, setEmojiIconActive] = useState(false)
-    const [inputValue, setInputValue] = useState('')
+    const { saveDraft, getDraft, clearDraft } = useDrafts()
     const theme = useTheme()
-    const { sendTextMessage, activeContactId } = useMessages()
+    const { sendTextMessage, sendVoiceMessage, activeContactId } = useMessages()
+    const inputRef = useRef(null)
+    const prevContactRef = useRef(activeContactId)
 
+    // State - restore draft for current contact
+    const [inputValue, setInputValue] = useState(() => getDraft(activeContactId))
+
+    // Save draft when switching contacts
+    if (prevContactRef.current !== activeContactId) {
+        saveDraft(prevContactRef.current, inputValue)
+        setInputValue(getDraft(activeContactId))
+        prevContactRef.current = activeContactId
+    }
+    const {
+        recordingState,
+        duration,
+        audioBlob,
+        startRecording,
+        stopRecording,
+        cancelRecording,
+        cleanupAudio,
+    } = useVoiceRecorder({ maxDuration: 60 })
+
+    // 简单写法：不用 useCallback，避免闭包问题
     const handleSend = () => {
         if (!inputValue.trim()) return
         sendTextMessage(inputValue)
         setInputValue('')
+        clearDraft(activeContactId)
     }
 
     const handleKeyDown = (e) => {
-        if (e.key === 'Enter') {
+        if (e.key === 'Enter' && !e.shiftKey) {
+            e.preventDefault()
             handleSend()
         }
+    }
+
+    const handleChange = (e) => {
+        setInputValue(e.target.value)
+        saveDraft(activeContactId, e.target.value)
+    }
+
+    // 将表情符号插入到输入框光标位置
+    const handleEmojiClick = (emojiChar) => {
+        const input = inputRef.current
+        if (input) {
+            const start = input.selectionStart || inputValue.length
+            const end = input.selectionEnd || inputValue.length
+            const newValue = inputValue.slice(0, start) + emojiChar + inputValue.slice(end)
+            setInputValue(newValue)
+            requestAnimationFrame(() => {
+                const newPos = start + emojiChar.length
+                input.setSelectionRange(newPos, newPos)
+                input.focus()
+            })
+        } else {
+            setInputValue(prev => prev + emojiChar)
+        }
+    }
+
+    const handleMicClick = () => {
+        if (recordingState === 'idle') {
+            startRecording()
+        } else if (recordingState === 'recording') {
+            stopRecording()
+        }
+    }
+
+    const handleSendVoice = () => {
+        if (!audioBlob) return
+        sendVoiceMessage(audioBlob, duration)
+        cleanupAudio()
+    }
+
+    const handleCancelVoice = () => {
+        cancelRecording()
+    }
+
+    const formatDuration = (seconds) => {
+        const mins = Math.floor(seconds / 60)
+        const secs = seconds % 60
+        return mins > 0 ? `${mins}:${secs.toString().padStart(2, '0')}` : `${secs}"`
+    }
+
+    const renderSuffix = () => {
+        if (recordingState === 'recording') {
+            return (
+                <IconContainer>
+                    <RecordingIndicator>
+                        <RecordingDot />
+                        <RecordingTime>{formatDuration(duration)}</RecordingTime>
+                        <RecordingCancelHint>点击停止</RecordingCancelHint>
+                    </RecordingIndicator>
+                    <Icon icon={CrossIcon} style={{ cursor: 'pointer' }} onClick={handleCancelVoice} />
+                </IconContainer>
+            )
+        }
+
+        if (recordingState === 'done') {
+            return (
+                <IconContainer>
+                    <RecordingIndicator style={{ animation: 'none' }}>
+                        <RecordingTime>{formatDuration(duration)}</RecordingTime>
+                    </RecordingIndicator>
+                    <Icon icon={CrossIcon} style={{ cursor: 'pointer' }} onClick={handleCancelVoice} />
+                    <Button size='42px' onClick={handleSendVoice}>
+                        <Icon icon={PlaneIcon} color='#fff' style={{ transform: 'translateX(-2px)' }} />
+                    </Button>
+                </IconContainer>
+            )
+        }
+
+        return (
+            <IconContainer>
+                <Popover
+                    content={<EmojiPickerContent onEmojiClick={handleEmojiClick} />}
+                    offset={{ x: '-25%' }}
+                    onVisible={() => setEmojiIconActive(true)}
+                    onHide={() => setEmojiIconActive(false)}
+                >
+                    <Icon icon={SmileIcon} color={emojiIconActive ? undefined : theme.gray3} style={{ cursor: 'pointer' }} />
+                </Popover>
+                <Icon icon={MicrphoneIcon} style={{ cursor: 'pointer' }} onClick={handleMicClick} />
+                <Button size='42px' onClick={handleSend}>
+                    <Icon icon={PlaneIcon} color='#fff' style={{ transform: 'translateX(-2px)' }} />
+                </Button>
+            </IconContainer>
+        )
     }
 
     return (
         <StyledFooter style={{ ...style, ...footerAnimation }} {...rest}>
             <Input
-                placeholder='请输入想和对方说的话'
+                multiline
+                placeholder='请输入想和对方说的话，Shift+Enter 换行'
                 value={inputValue}
-                onChange={(e) => setInputValue(e.target.value)}
+                onChange={handleChange}
                 onKeyDown={handleKeyDown}
-                disabled={!activeContactId}
-                prefix={<Icon icon={ClipIcon} />}
-                suffix={
-                    <IconContainer>
-                        <Popover
-                            content={<PopoverContent />}
-                            offset={{ x: '-25%' }}
-                            onVisible={() => setEmojiIconActive(true)}
-                            onHide={() => setEmojiIconActive(false)}
-                        >
-                            <Icon
-                                icon={SmileIcon}
-                                color={emojiIconActive ? undefined : theme.gray3}
-                                style={{ cursor: 'pointer' }}
-                            />
-                        </Popover>
-                        <Icon icon={MicrphoneIcon} style={{ cursor: 'pointer' }} />
-                        <Button size='42px' onClick={handleSend}>
-                            <Icon
-                                icon={PlaneIcon}
-                                color='#fff'
-                                style={{ transform: 'translateX(-2px)' }}
-                            />
-                        </Button>
-                    </IconContainer>
-                }
-
+                disabled={!activeContactId || recordingState !== 'idle'}
+                prefix={recordingState === 'idle' ? <Icon icon={ClipIcon} /> : null}
+                suffix={renderSuffix()}
+                ref={inputRef}
             />
         </StyledFooter>
     )
 }
 
-/* eslint-disable jsx-a11y/accessible-emoji */
-function PopoverContent (props) {
+function EmojiPickerContent ({ onEmojiClick }) {
+    const [activeCategory, setActiveCategory] = useState(EMOJI_CATEGORIES[0])
+
     return (
         <StyledPopoverContent>
-            <Emoji label='smile'> 😊 </Emoji>
-            <Emoji label='grinning'> 😆 </Emoji>
-            <Emoji label='thumbup'> 👍 </Emoji>
-            <Emoji label='ok'> 👌 </Emoji>
-            <Emoji label='handsputtogether'> 🙏 </Emoji>
-            <Emoji label='flexedbicep'> 💪 </Emoji>
-            <Emoji label='smilewithsunglasses'> 😎 </Emoji>
-            <Icon icon={OptionsIcon} style={{ marginLeft: '24px' }} />
+            <CategoryTabs>
+                {EMOJI_CATEGORIES.map((cat) => (
+                    <CategoryTab key={cat} $active={activeCategory === cat} onClick={(e) => { e.stopPropagation(); setActiveCategory(cat) }}>
+                        {categoryLabels[cat]}
+                    </CategoryTab>
+                ))}
+            </CategoryTabs>
+            <EmojiGrid>
+                {emojis[activeCategory].map((emojiChar, index) => (
+                    <EmojiItem key={`${activeCategory}-${index}`} onClick={() => onEmojiClick(emojiChar)} title={emojiChar}>
+                        {emojiChar}
+                    </EmojiItem>
+                ))}
+            </EmojiGrid>
         </StyledPopoverContent>
     )
 }
 
-Footer.propTypes = {
-    children: PropTypes.any
-}
+EmojiPickerContent.propTypes = { onEmojiClick: PropTypes.func.isRequired }
+Footer.propTypes = { children: PropTypes.any, footerAnimation: PropTypes.object, style: PropTypes.object }
 
 export default Footer
-
-
