@@ -42,7 +42,7 @@ function Login ({ onLogin, onSwitchToRegister }) {
       {/* Left panel - branding */}
       <div className='hidden lg:flex flex-col justify-between bg-muted/50 p-10'>
         <div className='flex items-center gap-2 text-lg font-medium'>
-          <img src='/logo.svg' alt='Echo' className='w-8 h-8' />
+          <img src='/logo.svg' alt='Echo' className='w-8 h-8 dark:invert' />
           Echo
         </div>
         <div className='space-y-4'>
@@ -65,7 +65,7 @@ function Login ({ onLogin, onSwitchToRegister }) {
           {/* Mobile back + logo */}
           <div className='lg:hidden mb-8'>
             <div className='flex items-center gap-2 text-lg font-medium'>
-              <img src='/logo.svg' alt='Echo' className='w-8 h-8' />
+              <img src='/logo.svg' alt='Echo' className='w-8 h-8 dark:invert' />
               Echo
             </div>
           </div>
@@ -156,7 +156,7 @@ function Register ({ onLogin, onBack }) {
     <div className='grid min-h-svh lg:grid-cols-2'>
       <div className='hidden lg:flex flex-col justify-between bg-muted/50 p-10'>
         <div className='flex items-center gap-2 text-lg font-medium'>
-          <img src='/logo.svg' alt='Echo' className='w-8 h-8' />
+          <img src='/logo.svg' alt='Echo' className='w-8 h-8 dark:invert' />
           Echo
         </div>
         <div className='space-y-4'>
@@ -177,7 +177,7 @@ function Register ({ onLogin, onBack }) {
               <ChevronLeft className='w-4 h-4' /> 返回登录
             </button>
             <div className='flex items-center gap-2 text-lg font-medium'>
-              <img src='/logo.svg' alt='Echo' className='w-8 h-8' />
+              <img src='/logo.svg' alt='Echo' className='w-8 h-8 dark:invert' />
               Echo
             </div>
           </div>

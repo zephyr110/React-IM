@@ -46,7 +46,7 @@ function NavBar () {
     <nav className='flex flex-col items-center h-full py-4 px-2 gap-1 bg-secondary/30 border-r'>
       {/* Logo */}
       <div className='mb-3'>
-        <img src='/logo.svg' alt='Echo' className='w-10 h-10' />
+        <img src='/logo.svg' alt='Echo' className='w-10 h-10 dark:invert' />
       </div>
 
       {/* Nav items */}
@@ -99,7 +99,7 @@ function NavBar () {
         </button>
 
         {menuOpen && (
-          <div className='absolute left-full bottom-0 ml-2 w-48 bg-popover border rounded-xl shadow-lg py-1.5 z-50'>
+          <div className='fixed bottom-4 left-16 w-48 bg-popover border rounded-xl shadow-lg py-1.5 z-[9999]'>
             {/* Theme options */}
             <div className='px-2 py-1'>
               <p className='text-xs text-muted-foreground px-2 py-1'>主题</p>
