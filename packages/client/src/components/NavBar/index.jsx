@@ -99,7 +99,7 @@ function NavBar () {
         </button>
 
         {menuOpen && (
-          <div className='absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-48 bg-popover border rounded-xl shadow-lg py-1.5 z-50'>
+          <div className='absolute left-full bottom-0 ml-2 w-48 bg-popover border rounded-xl shadow-lg py-1.5 z-50'>
             {/* Theme options */}
             <div className='px-2 py-1'>
               <p className='text-xs text-muted-foreground px-2 py-1'>主题</p>
