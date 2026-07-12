@@ -65,9 +65,7 @@ function Login ({ onLogin, onSwitchToRegister }) {
           {/* Mobile back + logo */}
           <div className='lg:hidden mb-8'>
             <div className='flex items-center gap-2 text-lg font-medium'>
-              <div className='w-8 h-8 rounded-lg bg-primary flex items-center justify-center'>
-                <MessageCircle className='w-5 h-5 text-primary-foreground' />
-              </div>
+              <img src='/logo.svg' alt='Echo' className='w-8 h-8' />
               Echo
             </div>
           </div>
@@ -179,9 +177,7 @@ function Register ({ onLogin, onBack }) {
               <ChevronLeft className='w-4 h-4' /> 返回登录
             </button>
             <div className='flex items-center gap-2 text-lg font-medium'>
-              <div className='w-8 h-8 rounded-lg bg-primary flex items-center justify-center'>
-                <MessageCircle className='w-5 h-5 text-primary-foreground' />
-              </div>
+              <img src='/logo.svg' alt='Echo' className='w-8 h-8' />
               Echo
             </div>
           </div>
