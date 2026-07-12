@@ -173,9 +173,9 @@ function Footer ({ footerAnimation, style, ...rest }) {
       )}
 
       {/* Input area */}
-      <div className='flex items-center gap-2'>
+      <div className='flex items-stretch gap-2'>
         {/* Clip button */}
-        <Button variant='ghost' size='icon' className='shrink-0' onClick={() => fileInputRef.current?.click()} disabled={disabled}>
+        <Button variant='ghost' size='icon' className='shrink-0 h-auto' onClick={() => fileInputRef.current?.click()} disabled={disabled}>
           <Paperclip className='w-5 h-5 text-muted-foreground' />
         </Button>
         <input type='file' ref={fileInputRef} className='hidden' accept='image/*' onChange={handleImageSelect} />
@@ -198,7 +198,7 @@ function Footer ({ footerAnimation, style, ...rest }) {
 
         {/* Emoji button */}
         <div className='relative' ref={emojiRef}>
-          <Button variant='ghost' size='icon' className='shrink-0' onClick={() => setEmojiOpen(!emojiOpen)} disabled={disabled}>
+          <Button variant='ghost' size='icon' className='shrink-0 h-auto' onClick={() => setEmojiOpen(!emojiOpen)} disabled={disabled}>
             <Smile className='w-5 h-5 text-muted-foreground' />
           </Button>
           {/* Emoji popover */}
@@ -234,12 +234,12 @@ function Footer ({ footerAnimation, style, ...rest }) {
         </div>
 
         {/* Mic button */}
-        <Button variant='ghost' size='icon' className='shrink-0' onClick={handleMicClick} disabled={disabled}>
+        <Button variant='ghost' size='icon' className='shrink-0 h-auto' onClick={handleMicClick} disabled={disabled}>
           <Mic className='w-5 h-5 text-muted-foreground' />
         </Button>
 
         {/* Send button */}
-        <Button size='icon' onClick={handleSend} disabled={disabled || (!inputValue.trim() && !imagePreview)} className='shrink-0'>
+        <Button size='icon' onClick={handleSend} disabled={disabled || (!inputValue.trim() && !imagePreview)} className='shrink-0 h-auto'>
           <Send className='w-4 h-4' />
         </Button>
       </div>
